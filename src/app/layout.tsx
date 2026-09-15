@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     siteName: "US Visa Consultant",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/images/hero-poster.jpg", width: 1280, height: 720, alt: "US Visa Consultant — window view over the clouds" }],
+    images: [{ url: "/images/hero-nyc-poster.jpg", width: 1280, height: 720, alt: "US Visa Consultant — Manhattan skyline at dusk" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "US Visa Consultant | Worldwide Visa Assistance",
     description: "Expert guidance for every visa journey — visit, study, work or family, across 40+ countries.",
-    images: ["/images/hero-poster.jpg"],
+    images: ["/images/hero-nyc-poster.jpg"],
   },
   robots: { index: true, follow: true },
 };
@@ -76,7 +76,7 @@ const localBusinessJsonLd = {
   url: "https://usvisaconsultantpvtltd.com",
   telephone: SITE.phone,
   email: SITE.email,
-  image: "https://usvisaconsultantpvtltd.com/images/hero-poster.jpg",
+  image: "https://usvisaconsultantpvtltd.com/images/hero-nyc-poster.jpg",
   logo: "https://usvisaconsultantpvtltd.com/logo.png",
   priceRange: "$",
   address: {
