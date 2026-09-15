@@ -35,6 +35,10 @@ export const metadata: Metadata = {
     "US Visa Consultant",
   ],
   authors: [{ name: "US Visa Consultant" }],
+  icons: {
+    icon: "/logo-192.png",
+    apple: "/logo-192.png",
+  },
   openGraph: {
     title: "US Visa Consultant | Worldwide Visa Assistance",
     description:
@@ -45,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#08080a",
+  themeColor: "#f7f9fd",
   width: "device-width",
   initialScale: 1,
 };
@@ -56,7 +60,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${sora.variable} ${inter.variable} ${playfair.variable} font-sans antialiased bg-background text-foreground`}
       >

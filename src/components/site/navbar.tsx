@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Plane, X, Phone } from "lucide-react";
+import { Menu, X, Sparkles } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { NAV_LINKS, SITE } from "@/lib/site-data";
@@ -22,50 +23,42 @@ export function Navbar() {
     <motion.header
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8, delay: 1.9, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-x-0 top-0 z-50"
     >
-      {/* Top info bar */}
-      <div
-        className={`hidden overflow-hidden border-b border-white/5 bg-[#0c0c0f] transition-all duration-500 lg:block ${
-          scrolled ? "max-h-0 border-transparent opacity-0" : "max-h-10 opacity-100"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2 text-xs text-muted-foreground">
-          <p className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-            Free consultation this week — slots open worldwide
-          </p>
-          <div className="flex items-center gap-5">
-            <a href={`mailto:${SITE.email}`} className="transition-colors hover:text-gold">
-              {SITE.email}
-            </a>
-            <span className="h-3 w-px bg-white/10" />
-            <a href={`tel:${SITE.phone}`} className="flex items-center gap-1.5 transition-colors hover:text-gold">
-              <Phone className="h-3 w-3" /> {SITE.phone}
-            </a>
-          </div>
-        </div>
-      </div>
-
       {/* Main bar */}
       <div
         className={`transition-all duration-500 ${
-          scrolled ? "border-b border-white/5 bg-[#08080a]/85 py-3 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-xl" : "bg-transparent py-5"
+          scrolled
+            ? "border-b border-[#0d1b33]/8 bg-white/92 py-2 shadow-[0_10px_40px_-12px_rgba(13,27,51,0.18)] backdrop-blur-xl"
+            : "bg-transparent py-3 sm:py-4"
         }`}
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6" aria-label="Main navigation">
-          {/* Logo */}
-          <a href="#home" className="group flex items-center gap-3">
-            <span className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-gold/30 bg-gold/10 transition-all group-hover:bg-gold/20">
-              <Plane className="h-5 w-5 text-gold transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:rotate-12" />
+          {/* Logo (original brand mark) */}
+          <a href="#home" className="group flex items-center gap-2.5 sm:gap-3" aria-label="US Visa Consultant — home">
+            <span
+              className={`relative flex items-center justify-center rounded-2xl bg-white shadow-[0_8px_26px_-8px_rgba(13,27,51,0.4)] ring-1 ring-[#0d1b33]/10 transition-all duration-500 group-hover:shadow-[0_10px_30px_-8px_rgba(29,79,216,0.5)] group-hover:ring-[#1d4fd8]/30 ${
+                scrolled ? "h-12 w-12 sm:h-13 sm:w-13" : "h-14 w-14 sm:h-16 sm:w-16"
+              }`}
+            >
+              <Image
+                src="/logo.png"
+                alt="US Visa Consultant official logo"
+                width={64}
+                height={64}
+                className={`object-contain transition-all duration-500 ${
+                  scrolled ? "h-10 w-10 sm:h-11 sm:w-11" : "h-12 w-12 sm:h-14 sm:w-14"
+                }`}
+                priority
+              />
             </span>
-            <span className="leading-tight">
-              <span className="block font-display text-[15px] font-bold tracking-wide text-foreground">
-                US VISA <span className="text-gradient-gold">CONSULTANT</span>
+            <span className="hidden leading-tight sm:block">
+              <span className="block font-display text-base font-extrabold tracking-wide text-[#0d1b33]">
+                US VISA <span className="text-[#1d4fd8]">CONSULTANT</span>
               </span>
-              <span className="block text-[9.5px] font-medium uppercase tracking-[0.3em] text-muted-foreground">
-                Worldwide Visa Partner
+              <span className="mt-0.5 block text-[9.5px] font-bold uppercase tracking-[0.3em] text-[#e23a3a]">
+                World Wide Visa
               </span>
             </span>
           </a>
@@ -76,7 +69,7 @@ export function Navbar() {
               <li key={l.href}>
                 <a
                   href={l.href}
-                  className="relative rounded-full px-3.5 py-2 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-gold after:transition-transform hover:after:scale-x-100"
+                  className="relative rounded-full px-3.5 py-2 text-[13px] font-semibold text-[#3d4d6b] transition-colors hover:text-[#1d4fd8] after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-[#1d4fd8] after:transition-transform hover:after:scale-x-100"
                 >
                   {l.label}
                 </a>
@@ -87,10 +80,11 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             <Button
               asChild
-              className="group relative hidden overflow-hidden rounded-full bg-gold font-semibold text-[#17130a] shadow-[0_0_24px_rgba(232,182,76,0.35)] transition-all hover:shadow-[0_0_36px_rgba(232,182,76,0.55)] sm:inline-flex"
+              className="group relative hidden overflow-hidden rounded-full bg-[#1d4fd8] font-semibold text-white shadow-[0_8px_28px_-8px_rgba(29,79,216,0.7)] transition-all hover:bg-[#1a46c2] hover:shadow-[0_10px_36px_-8px_rgba(29,79,216,0.85)] sm:inline-flex"
             >
               <a href="#contact">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <Sparkles className="mr-1.5 h-4 w-4" />
                 Free Consultation
               </a>
             </Button>
@@ -101,7 +95,7 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   size="icon"
-                  className="rounded-xl border-white/10 bg-white/5 text-foreground xl:hidden"
+                  className="rounded-xl border-[#0d1b33]/10 bg-white/80 text-[#0d1b33] shadow-sm backdrop-blur xl:hidden"
                   aria-label="Open menu"
                 >
                   {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -109,10 +103,21 @@ export function Navbar() {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-[86vw] max-w-sm border-white/10 bg-[#0c0c0f]/95 backdrop-blur-2xl"
+                className="w-[86vw] max-w-sm border-[#0d1b33]/10 bg-white/95 backdrop-blur-2xl"
               >
                 <SheetTitle className="sr-only">Navigation menu</SheetTitle>
-                <div className="mt-8 flex flex-col gap-1">
+                <div className="mt-6 flex items-center gap-3 border-b border-[#0d1b33]/8 pb-5">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-[0_8px_26px_-8px_rgba(13,27,51,0.35)] ring-1 ring-[#0d1b33]/10">
+                    <Image src="/logo.png" alt="US Visa Consultant logo" width={56} height={56} className="h-12 w-12 object-contain" />
+                  </span>
+                  <div className="leading-tight">
+                    <p className="font-display text-sm font-extrabold text-[#0d1b33]">
+                      US VISA <span className="text-[#1d4fd8]">CONSULTANT</span>
+                    </p>
+                    <p className="text-[8.5px] font-bold uppercase tracking-[0.28em] text-[#e23a3a]">World Wide Visa</p>
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-col gap-1">
                   {NAV_LINKS.map((l, i) => (
                     <motion.a
                       key={l.href}
@@ -120,24 +125,24 @@ export function Navbar() {
                       onClick={() => setOpen(false)}
                       initial={{ opacity: 0, x: 24 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.05 * i }}
-                      className="group flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-medium text-muted-foreground transition-colors hover:bg-gold/10 hover:text-gold"
+                      transition={{ delay: 0.04 * i }}
+                      className="group flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-semibold text-[#3d4d6b] transition-colors hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
                     >
                       {l.label}
-                      <span className="text-xs text-gold/50 opacity-0 transition-opacity group-hover:opacity-100">
+                      <span className="text-xs text-[#1d4fd8]/60 opacity-0 transition-opacity group-hover:opacity-100">
                         →
                       </span>
                     </motion.a>
                   ))}
                 </div>
-                <Button asChild className="mt-6 w-full rounded-full bg-gold font-semibold text-[#17130a]">
+                <Button asChild className="mt-6 w-full rounded-full bg-[#1d4fd8] font-semibold text-white">
                   <a href="#contact" onClick={() => setOpen(false)}>
                     Free Consultation
                   </a>
                 </Button>
-                <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-muted-foreground">
-                  <p className="font-semibold text-foreground">Call us directly</p>
-                  <a href={`tel:${SITE.phone}`} className="mt-1 block text-gold">
+                <div className="mt-7 rounded-2xl border border-[#0d1b33]/8 bg-[#f5f8fe] p-4 text-sm text-[#5a6a86]">
+                  <p className="font-bold text-[#0d1b33]">Call us directly</p>
+                  <a href={`tel:${SITE.phone}`} className="mt-1 block font-semibold text-[#1d4fd8]">
                     {SITE.phone}
                   </a>
                   <p className="mt-2 text-xs">{SITE.hours}</p>

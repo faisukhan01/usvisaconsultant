@@ -31,9 +31,9 @@ export function Faq() {
               <AccordionItem
                 key={i}
                 value={`faq-${i}`}
-                className="overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03] px-5 transition-colors data-[state=open]:border-gold/30 data-[state=open]:bg-gold/[0.05]"
+                className="overflow-hidden rounded-2xl border border-[#0d1b33]/8 bg-white px-5 shadow-[0_12px_36px_-28px_rgba(13,27,51,0.45)] transition-colors data-[state=open]:border-[#1d4fd8]/30 data-[state=open]:bg-[#1d4fd8]/[0.04]"
               >
-                <AccordionTrigger className="py-5 text-left font-display text-[15px] font-bold text-foreground hover:no-underline sm:text-base [&[data-state=open]>svg]:text-gold">
+                <AccordionTrigger className="py-5 text-left font-display text-[15px] font-bold text-[#0d1b33] hover:no-underline sm:text-base [&[data-state=open]>svg]:text-[#1d4fd8]">
                   {f.q}
                 </AccordionTrigger>
                 <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">

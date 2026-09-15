@@ -47,7 +47,7 @@ export function Testimonials() {
         <Reveal delay={0.15}>
           <div className="relative mt-14">
             {/* Big quote mark */}
-            <Quote className="absolute -top-8 left-1/2 h-16 w-16 -translate-x-1/2 text-gold/15" />
+            <Quote className="absolute -top-8 left-1/2 h-16 w-16 -translate-x-1/2 text-[#1d4fd8]/12" />
 
             <div className="glass gold-ring relative min-h-[320px] overflow-hidden rounded-[2rem] p-8 sm:min-h-[280px] sm:p-12">
               <AnimatePresence mode="wait" custom={direction}>
@@ -62,14 +62,14 @@ export function Testimonials() {
                 >
                   <div className="flex gap-1" aria-label={`${t.rating} star rating`}>
                     {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="h-4.5 w-4.5 fill-gold text-gold" />
+                      <Star key={i} className="h-4.5 w-4.5 fill-[#f59e0b] text-[#f59e0b]" />
                     ))}
                   </div>
                   <blockquote className="mt-5 max-w-2xl font-display text-lg font-medium leading-relaxed text-foreground sm:text-2xl sm:leading-relaxed">
                     “{t.quote}”
                   </blockquote>
                   <figcaption className="mt-7 flex items-center gap-4">
-                    <span className="flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-soft font-display text-base font-bold text-[#17130a] sm:h-14 sm:w-14">
+                    <span className="flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-br from-[#1d4fd8] to-[#5b85ec] font-display text-base font-bold text-white sm:h-14 sm:w-14">
                       {t.initials}
                     </span>
                     <span className="text-left">
@@ -78,8 +78,8 @@ export function Testimonials() {
                         <span className="inline-flex items-center gap-1">
                           <MapPin className="h-3 w-3" /> {t.location}
                         </span>
-                        <span className="h-1 w-1 rounded-full bg-gold/60" />
-                        <span className="text-gold">{t.service}</span>
+                        <span className="h-1 w-1 rounded-full bg-[#1d4fd8]/60" />
+                        <span className="font-semibold text-[#1d4fd8]">{t.service}</span>
                       </span>
                     </span>
                   </figcaption>
@@ -95,7 +95,7 @@ export function Testimonials() {
                   resetTimer();
                 }}
                 aria-label="Previous testimonial"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground transition-all hover:border-gold/40 hover:bg-gold/10 hover:text-gold"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-sm transition-all hover:border-[#1d4fd8]/40 hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -110,7 +110,7 @@ export function Testimonials() {
                     }}
                     aria-label={`Go to testimonial ${i + 1}`}
                     className={`h-2 rounded-full transition-all duration-500 ${
-                      i === index ? "w-8 bg-gold" : "w-2 bg-white/20 hover:bg-white/40"
+                      i === index ? "w-8 bg-[#1d4fd8]" : "w-2 bg-[#0d1b33]/15 hover:bg-[#0d1b33]/30"
                     }`}
                   />
                 ))}
@@ -121,7 +121,7 @@ export function Testimonials() {
                   resetTimer();
                 }}
                 aria-label="Next testimonial"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground transition-all hover:border-gold/40 hover:bg-gold/10 hover:text-gold"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-sm transition-all hover:border-[#1d4fd8]/40 hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

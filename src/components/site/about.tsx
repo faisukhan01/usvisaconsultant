@@ -3,140 +3,152 @@
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { BadgeCheck, Quote, Award, Users, Target } from "lucide-react";
-import { Reveal, SectionHeading } from "@/components/site/reveal";
+import { BadgeCheck, ArrowRight } from "lucide-react";
+import { Reveal } from "@/components/site/reveal";
+import { Button } from "@/components/ui/button";
 
-const VALUES = [
-  {
-    icon: Award,
-    title: "Expert Guidance",
-    text: "Seasoned professionals dedicated to your case from the first call to the final stamp.",
-  },
-  {
-    icon: Target,
-    title: "Personalized Approach",
-    text: "We dig into your unique circumstances and build the strategy that fits them — never a template.",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Commitment to Success",
-    text: "An unwavering dedication to your approval is what sets us apart in this industry.",
-  },
+const MILESTONES = [
+  { year: "2010", label: "Founded in Lahore with a single desk and a big conviction" },
+  { year: "2016", label: "5,000th approved visa — expansion to study & work routes" },
+  { year: "Today", label: "40+ countries served by a team of licensed consultants" },
+];
+
+const PROMISES = [
+  "A dedicated consultant on your case, start to stamp",
+  "Embassy-standard documentation — zero guesswork",
+  "Honest eligibility assessment before you pay a rupee",
 ];
 
 export function About() {
   const imgWrapRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: imgWrapRef, offset: ["start end", "end start"] });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const imgY = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
 
   return (
-    <section id="about" className="relative overflow-hidden py-24 sm:py-32">
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]" />
+    <section id="about" className="relative overflow-hidden py-20 sm:py-28 lg:py-32">
+      <div className="bg-grid pointer-events-none absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_15%,transparent_72%)]" />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow="About Us"
-          title={
-            <>
-              Discover the journey of our <span className="text-gradient-gold font-serif-accent italic">commitment</span> to visa success
-            </>
-          }
-        />
-
-        <div className="mt-16 grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Image side */}
-          <div ref={imgWrapRef} className="relative">
+      <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+          {/* ── Visual — one clean frame, quietly framed ─────────── */}
+          <div ref={imgWrapRef} className="relative mx-auto w-full max-w-xl lg:max-w-none">
             <Reveal>
-              <div className="gold-ring relative overflow-hidden rounded-[2rem]">
-                <motion.div style={{ y: imgY }} className="relative aspect-[4/3] scale-[1.18]">
-                  <Image
-                    src="/images/about-office.png"
-                    alt="US Visa Consultant office — advisors guiding clients with skyline view"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    priority={false}
-                  />
-                </motion.div>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#08080a]/70 via-transparent to-transparent" />
-              </div>
-            </Reveal>
-
-            {/* Floating founder card */}
-            <Reveal delay={0.2} className="relative z-10 -mt-16 ml-4 max-w-sm sm:ml-8">
-              <div className="glass gold-ring animate-floaty rounded-2xl p-5 shadow-2xl">
-                <Quote className="h-5 w-5 text-gold" />
-                <p className="mt-2 text-sm leading-relaxed text-foreground/90">
-                  “We don’t process applications — we build futures, one approved visa at a time.”
-                </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-gold to-gold-soft font-display text-sm font-bold text-[#17130a]">
-                    US
-                  </span>
-                  <div>
-                    <p className="text-sm font-bold text-foreground">Ume Salma</p>
-                    <p className="text-xs text-gold">Founder & Lead Consultant</p>
-                  </div>
+              <div className="relative">
+                {/* offset frame accent */}
+                <div
+                  aria-hidden="true"
+                  className="absolute -left-3 -top-3 h-full w-full rounded-[1.75rem] border border-[#1d4fd8]/15 sm:-left-4 sm:-top-4"
+                />
+                <div className="relative overflow-hidden rounded-[1.75rem] shadow-[0_36px_90px_-36px_rgba(13,27,51,0.45)] ring-1 ring-[#0d1b33]/8">
+                  <motion.div style={{ y: imgY }} className="relative aspect-[4/3] scale-[1.14]">
+                    <Image
+                      src="/images/about-office.png"
+                      alt="US Visa Consultant office — advisors guiding clients with skyline view"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </motion.div>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a142e]/25 via-transparent to-transparent" />
                 </div>
               </div>
             </Reveal>
 
-            {/* Experience badge */}
-            <div className="glass gold-ring absolute -right-3 -top-6 flex h-28 w-28 flex-col items-center justify-center rounded-full text-center sm:-right-6 sm:h-32 sm:w-32">
-              <span className="font-display text-3xl font-extrabold text-gradient-gold sm:text-4xl">15+</span>
-              <span className="mt-1 max-w-[80px] text-[9.5px] font-semibold uppercase leading-tight tracking-[0.14em] text-muted-foreground">
-                Years Of Excellence
-              </span>
-            </div>
+            {/* Founder chip — aligned below, no overlap */}
+            <Reveal delay={0.2}>
+              <div className="mt-6 flex items-center gap-4 rounded-2xl border border-[#0d1b33]/8 bg-white px-5 py-4 shadow-[0_14px_40px_-22px_rgba(13,27,51,0.35)]">
+                <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[#1d4fd8]/20">
+                  <Image
+                    src="/images/founder.png"
+                    alt="Ume Salma — Founder, US Visa Consultant"
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-[#0d1b33]">
+                    Ume Salma
+                    <span className="ml-2 text-xs font-semibold text-[#1d4fd8]">Founder & Lead Consultant</span>
+                  </p>
+                  <p className="mt-0.5 truncate text-[13px] italic text-[#5a6a86]">
+                    “We build futures, one approved visa at a time.”
+                  </p>
+                </div>
+              </div>
+            </Reveal>
           </div>
 
-          {/* Text side */}
+          {/* ── Story ────────────────────────────────────────────── */}
           <div>
             <Reveal>
-              <h3 className="font-display text-2xl font-bold leading-snug sm:text-3xl">
-                Founded by seasoned professionals to{" "}
-                <span className="text-gold">simplify the complex</span> visa process — for individuals worldwide.
-              </h3>
+              <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.24em] text-[#1d4fd8] sm:text-xs">
+                <span className="h-px w-8 bg-[#1d4fd8]/60" aria-hidden="true" />
+                Our Story
+              </p>
+              <h2 className="mt-4 font-display text-[27px] font-extrabold leading-[1.15] tracking-tight text-[#0d1b33] sm:text-4xl lg:text-[2.6rem]">
+                Built on commitment.
+                <br />
+                Proven by <span className="font-serif-accent font-semibold italic text-[#1d4fd8]">approvals</span>.
+              </h2>
             </Reveal>
+
             <Reveal delay={0.1}>
-              <p className="mt-5 leading-relaxed text-muted-foreground">
-                What began as a small consultancy with a single conviction — that no dream should be
-                buried under paperwork — has grown into a worldwide visa partner trusted by thousands of
+              <p className="mt-5 max-w-xl leading-relaxed text-[#5a6a86] sm:text-[17px]">
+                What began as a small consultancy with one conviction — that no dream should be
+                buried under paperwork — is today a worldwide visa partner trusted by thousands of
                 families, students and professionals.
               </p>
             </Reveal>
 
-            <div className="mt-9 space-y-5">
-              {VALUES.map((v, i) => (
-                <Reveal key={v.title} delay={0.12 + i * 0.08}>
-                  <div className="group flex gap-4 rounded-2xl border border-transparent p-4 transition-all hover:border-gold/20 hover:bg-gold/[0.04]">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold/25 bg-gold/10 transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110">
-                      <v.icon className="h-5.5 w-5.5 text-gold" />
+            {/* Milestones — quiet vertical timeline */}
+            <div className="mt-8 space-y-0">
+              {MILESTONES.map((m, i) => (
+                <Reveal key={m.year} delay={0.14 + i * 0.08}>
+                  <div className="relative flex gap-5 pb-6 last:pb-0">
+                    {i < MILESTONES.length - 1 && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-[27px] top-11 h-[calc(100%-2.4rem)] w-px bg-gradient-to-b from-[#1d4fd8]/35 to-[#1d4fd8]/8"
+                      />
+                    )}
+                    <span className="flex h-11 w-14 shrink-0 items-center justify-center rounded-xl bg-[#f0f4fd] font-display text-[13px] font-extrabold text-[#1d4fd8] ring-1 ring-[#1d4fd8]/15">
+                      {m.year}
                     </span>
-                    <div>
-                      <h4 className="font-display text-base font-bold text-foreground">{v.title}</h4>
-                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{v.text}</p>
-                    </div>
+                    <p className="pt-1.5 text-sm leading-relaxed text-[#3d4d6b] sm:text-[15px]">{m.label}</p>
                   </div>
                 </Reveal>
               ))}
             </div>
 
-            <Reveal delay={0.4}>
-              <div className="mt-8 flex flex-wrap items-center gap-6">
-                <div className="flex items-center gap-2.5">
-                  <Users className="h-4.5 w-4.5 text-emerald-400" />
-                  <span className="text-sm text-muted-foreground">
-                    <span className="font-bold text-foreground">8,000+ families</span> reunited & counting
-                  </span>
-                </div>
-                <a
-                  href="#contact"
-                  className="group inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-gold"
+            {/* Promises checklist */}
+            <Reveal delay={0.34}>
+              <ul className="mt-8 space-y-2.5 border-t border-[#0d1b33]/8 pt-7">
+                {PROMISES.map((p) => (
+                  <li key={p} className="flex items-start gap-2.5 text-sm text-[#3d4d6b] sm:text-[15px]">
+                    <BadgeCheck className="mt-0.5 h-4.5 w-4.5 shrink-0 text-[#1d4fd8]" />
+                    {p}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+
+            <Reveal delay={0.42}>
+              <div className="mt-8 flex flex-wrap items-center gap-5">
+                <Button
+                  asChild
+                  className="group relative h-12 overflow-hidden rounded-full bg-[#1d4fd8] px-7 text-[15px] font-bold text-white shadow-[0_14px_36px_-12px_rgba(29,79,216,0.7)] hover:bg-[#1a46c2]"
                 >
-                  Learn more about us
-                  <span className="h-px w-8 bg-gold transition-all group-hover:w-12" />
-                </a>
+                  <a href="#contact">
+                    <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                    Start Your Story
+                    <ArrowRight className="ml-1.5 h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
+                  </a>
+                </Button>
+                <p className="text-[13px] font-semibold text-[#5a6a86]">
+                  <span className="font-display text-lg font-extrabold text-[#0d1b33]">8,000+</span>{" "}
+                  families reunited & counting
+                </p>
               </div>
             </Reveal>
           </div>

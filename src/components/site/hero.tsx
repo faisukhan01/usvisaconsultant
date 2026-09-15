@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useInView, animate } from "framer-motion";
-import { ArrowRight, PlayCircle, ShieldCheck, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HERO_STATS } from "@/lib/site-data";
 
-const HEADLINE = ["Your", "Passport", "To", "The"];
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 function Counter({ value, suffix }: { value: number; suffix: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -16,8 +17,8 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
   useEffect(() => {
     if (!inView) return;
     const controls = animate(0, value, {
-      duration: 2.2,
-      ease: [0.22, 1, 0.36, 1],
+      duration: 2,
+      ease: EASE,
       onUpdate: (v) => setDisplay(Math.round(v)),
     });
     return () => controls.stop();
@@ -36,9 +37,8 @@ export function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
   // Autoplay fallback
   useEffect(() => {
@@ -51,13 +51,26 @@ export function Hero() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="home" className="noise relative flex min-h-[100svh] items-center overflow-hidden">
-      {/* Video background */}
-      <motion.div style={{ y: yBg, scale }} className="absolute inset-0">
+    <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
+      {/* Cinematic background — plane window over blue sky & clouds */}
+      <motion.div style={{ y: yBg }} className="absolute inset-0">
+        {/* Poster stays beneath the video: instant paint + graceful fallback */}
+        <Image
+          src="/images/hero-poster.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[62%_50%]"
+          aria-hidden="true"
+        />
         <video
           ref={videoRef}
-          className={`h-full w-full object-cover transition-opacity duration-[1600ms] ${videoReady ? "opacity-100" : "opacity-0"}`}
-          src="/videos/plane-takeoff-sunrise.mp4"
+          className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
+            videoReady ? "opacity-100" : "opacity-0"
+          }`}
+          poster="/images/hero-poster.jpg"
+          src="/videos/hero-flight.mp4"
           muted
           loop
           playsInline
@@ -68,92 +81,89 @@ export function Hero() {
         />
       </motion.div>
 
-      {/* Cinematic overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#08080a]/85 via-[#08080a]/55 to-[#08080a]" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(8,8,10,0.75)_100%)]" />
-      <div className="pointer-events-none absolute -left-32 top-1/3 h-96 w-96 rounded-full bg-gold/15 blur-[150px]" />
+      {/* Cinematic scrims — readable left column, sky stays visible on the right */}
+      <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/70 via-white/25 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/25 to-transparent sm:from-white/70 sm:via-white/15" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-b from-transparent to-[#f7f9fd]" />
 
-      {/* Content */}
-      <motion.div style={{ opacity }} className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-28 pt-40 sm:px-6 sm:pt-44">
-        <div className="max-w-3xl">
+      {/* Editorial content — anchored left, breathes against the sky on the right */}
+      <motion.div
+        style={{ opacity: fade }}
+        className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-10 pt-28 sm:px-8 sm:pt-32 lg:pt-36"
+      >
+        <div className="max-w-2xl">
           {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-gold/30 bg-black/40 py-1.5 pl-2 pr-4 backdrop-blur-md"
+            transition={{ delay: 0.15, duration: 0.7, ease: EASE }}
+            className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.24em] text-[#1d4fd8] sm:text-xs"
           >
-            <span className="flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#17130a]">
-              <Sparkles className="h-3 w-3" /> Since 2010
-            </span>
-            <span className="text-xs font-medium tracking-wide text-foreground/90">
-              Trusted Worldwide Visa Assistance Partner
-            </span>
-          </motion.div>
+            <span className="h-px w-8 bg-[#1d4fd8]/60 sm:w-10" aria-hidden="true" />
+            Trusted visa consultants since 2010
+          </motion.p>
 
           {/* Headline */}
-          <h1 className="font-display text-[13vw] font-extrabold leading-[1.02] tracking-tight sm:text-6xl lg:text-7xl xl:text-[5.2rem]">
-            {HEADLINE.map((word, i) => (
-              <motion.span
-                key={word}
-                className="mr-[0.28em] inline-block"
-                initial={{ opacity: 0, y: 60, rotateX: -50 }}
-                animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                transition={{ delay: 2.1 + i * 0.12, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {word}
-              </motion.span>
-            ))}
-            <br />
+          <h1 className="mt-5 font-display text-[11.5vw] font-extrabold leading-[1.06] tracking-[-0.02em] text-[#0d1b33] sm:text-6xl lg:text-7xl xl:text-[5.1rem]">
             <motion.span
-              className="text-gradient-gold inline-block font-serif-accent italic"
-              initial={{ opacity: 0, y: 60, rotateX: -50 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              transition={{ delay: 2.55, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="block"
+              initial={{ opacity: 0, y: 34 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28, duration: 0.85, ease: EASE }}
             >
-              World.
+              Your Passport
+            </motion.span>
+            <motion.span
+              className="block"
+              initial={{ opacity: 0, y: 34 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.42, duration: 0.85, ease: EASE }}
+            >
+              To The{" "}
+              <span className="font-serif-accent font-semibold italic tracking-normal text-[#1d4fd8]">
+                World
+              </span>
+              <span className="text-[#1d4fd8]">.</span>
             </motion.span>
           </h1>
 
+          {/* Subcopy */}
           <motion.p
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.75, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-foreground/80 sm:text-lg"
+            transition={{ delay: 0.56, duration: 0.8, ease: EASE }}
+            className="mt-5 max-w-xl text-[15px] leading-relaxed text-[#3d4d6b] sm:mt-6 sm:text-lg"
           >
-            Expert guidance for every visa journey — visit, study, work or family.
-            A smooth, successful application process tailored just for you, in{" "}
-            <span className="font-semibold text-gold">40+ countries</span>.
+            Visit, study, work or reunite — expert guidance and a flawless file for
+            embassies across <span className="font-bold text-[#0d1b33]">40+ countries</span>,
+            prepared for you end to end.
           </motion.p>
 
           {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.9, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-9 flex flex-wrap items-center gap-4"
+            transition={{ delay: 0.7, duration: 0.8, ease: EASE }}
+            className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center sm:gap-4"
           >
             <Button
               asChild
               size="lg"
-              className="group relative h-14 overflow-hidden rounded-full bg-gold px-8 text-base font-bold text-[#17130a] shadow-[0_0_40px_rgba(232,182,76,0.4)] transition-all hover:shadow-[0_0_60px_rgba(232,182,76,0.6)]"
+              className="group relative h-13 w-full overflow-hidden rounded-full bg-[#1d4fd8] px-8 text-[15px] font-bold text-white shadow-[0_18px_44px_-14px_rgba(29,79,216,0.75)] transition-all hover:bg-[#1a46c2] sm:h-14 sm:w-auto sm:px-9"
             >
               <a href="#contact">
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                Start My Visa Journey
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                Free Consultation
+                <ArrowRight className="ml-2 h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
               </a>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="glass h-14 rounded-full px-8 text-base font-semibold text-foreground hover:bg-white/10"
+              className="h-13 w-full rounded-full border-[#0d1b33]/12 bg-white/85 px-8 text-[15px] font-semibold text-[#0d1b33] shadow-[0_12px_32px_-16px_rgba(13,27,51,0.35)] backdrop-blur-md hover:bg-white sm:h-14 sm:w-auto sm:px-9"
             >
-              <a href="#services">
-                <PlayCircle className="mr-2 h-5 w-5 text-gold" />
-                Explore Services
-              </a>
+              <a href="#services">Explore Services</a>
             </Button>
           </motion.div>
 
@@ -161,51 +171,48 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 3.2, duration: 1 }}
-            className="mt-7 flex items-center gap-2 text-xs text-foreground/60"
+            transition={{ delay: 0.88, duration: 0.9 }}
+            className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2"
           >
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            Licensed advisors · Embassy-standard files · 98% satisfaction
+            <span className="flex items-center gap-1" aria-label="Rated 4.9 out of 5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              ))}
+              <span className="ml-1 text-[13px] font-bold text-[#0d1b33]">4.9</span>
+            </span>
+            <span className="hidden h-3.5 w-px bg-[#0d1b33]/15 sm:block" aria-hidden="true" />
+            <span className="text-[13px] font-medium text-[#3d4d6b]">
+              12,400+ visas approved · 98% client satisfaction
+            </span>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Stats bar */}
+      {/* Stats — grounded glass strip at the bottom of the hero */}
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 32 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 3.1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-x-0 bottom-0 z-10"
+        transition={{ delay: 1, duration: 0.9, ease: EASE }}
+        className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-6 sm:px-8 sm:pb-8"
       >
-        <div className="mx-auto max-w-7xl px-4 pb-6 sm:px-6">
-          <div className="glass gold-ring grid grid-cols-2 gap-y-6 rounded-3xl px-6 py-6 sm:px-10 md:grid-cols-4">
-            {HERO_STATS.map((s) => (
-              <div key={s.label} className="flex flex-col items-center text-center md:items-start md:text-left">
-                <span className="font-display text-3xl font-extrabold text-gradient-gold sm:text-4xl">
-                  <Counter value={s.value} suffix={s.suffix} />
-                </span>
-                <span className="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 gap-y-4 rounded-2xl border border-white/70 bg-white/80 px-4 py-4 shadow-[0_24px_60px_-28px_rgba(13,27,51,0.4)] backdrop-blur-xl sm:rounded-3xl sm:px-8 sm:py-5 md:grid-cols-4">
+          {HERO_STATS.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex flex-col items-center gap-0.5 text-center ${
+                i > 0 ? "md:border-l md:border-[#0d1b33]/10" : ""
+              }`}
+            >
+              <span className="font-display text-2xl font-extrabold leading-none text-[#1d4fd8] sm:text-3xl">
+                <Counter value={s.value} suffix={s.suffix} />
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#5a6a86] sm:text-[10.5px]">
+                {s.label}
+              </span>
+            </div>
+          ))}
         </div>
       </motion.div>
-
-      {/* Scroll cue */}
-      <motion.a
-        href="#about"
-        aria-label="Scroll to about section"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 3.6 }}
-        className="absolute bottom-36 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-muted-foreground lg:flex"
-      >
-        <span className="flex h-9 w-5.5 items-start justify-center rounded-full border border-white/20 p-1.5">
-          <span className="animate-scroll-dot h-1.5 w-1.5 rounded-full bg-gold" />
-        </span>
-      </motion.a>
     </section>
   );
 }

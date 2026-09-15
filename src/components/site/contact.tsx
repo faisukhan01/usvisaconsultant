@@ -109,10 +109,10 @@ export function Contact() {
                 <Reveal key={c.label} delay={i * 0.07}>
                   <a
                     href={c.href}
-                    className="group flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.03] p-5 transition-all duration-500 hover:-translate-y-0.5 hover:border-gold/30 hover:bg-gold/[0.05]"
+                    className="group flex items-center gap-4 rounded-2xl border border-[#0d1b33]/8 bg-white p-5 shadow-[0_14px_40px_-28px_rgba(13,27,51,0.4)] transition-all duration-500 hover:-translate-y-0.5 hover:border-[#1d4fd8]/30 hover:shadow-[0_22px_54px_-24px_rgba(29,79,216,0.5)]"
                   >
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-gold/25 bg-gold/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                      <Icon className="h-5 w-5 text-gold" />
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#1d4fd8]/25 bg-[#1d4fd8]/10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                      <Icon className="h-5 w-5 text-[#1d4fd8]" />
                     </span>
                     <span>
                       <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -126,8 +126,8 @@ export function Contact() {
             })}
 
             <Reveal delay={0.3}>
-              <div className="gold-ring relative overflow-hidden rounded-2xl bg-gradient-to-br from-gold/15 via-gold/5 to-transparent p-6">
-                <BadgeCheck className="h-8 w-8 text-gold" />
+              <div className="gold-ring relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1d4fd8]/12 via-[#1d4fd8]/5 to-transparent p-6">
+                <BadgeCheck className="h-8 w-8 text-[#1d4fd8]" />
                 <p className="mt-3 font-display text-lg font-bold text-foreground">Free first consultation</p>
                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                   No fees, no obligation — just an honest assessment of your case and your best route
@@ -139,7 +139,7 @@ export function Contact() {
 
           {/* Form */}
           <Reveal delay={0.12} className="lg:col-span-3">
-            <div className="glass gold-ring relative h-full rounded-[2rem] p-6 sm:p-9">
+            <div className="glass gold-ring relative h-full rounded-[2rem] bg-white/85 p-6 shadow-[0_28px_70px_-32px_rgba(13,27,51,0.45)] sm:p-9">
               <AnimatePresence mode="wait">
                 {submitted ? (
                   <motion.div
@@ -153,9 +153,9 @@ export function Contact() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 220, damping: 14, delay: 0.15 }}
-                      className="glow-gold flex h-20 w-20 items-center justify-center rounded-full bg-gold/15"
+                      className="glow-gold flex h-20 w-20 items-center justify-center rounded-full bg-[#1d4fd8]/10"
                     >
-                      <CheckCircle2 className="h-10 w-10 text-gold" />
+                      <CheckCircle2 className="h-10 w-10 text-[#1d4fd8]" />
                     </motion.span>
                     <h3 className="mt-6 font-display text-2xl font-bold text-foreground">Application received!</h3>
                     <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
@@ -165,7 +165,7 @@ export function Contact() {
                     <Button
                       variant="outline"
                       onClick={() => setSubmitted(false)}
-                      className="mt-8 rounded-full border-gold/40 text-gold hover:bg-gold/10"
+                      className="mt-8 rounded-full border-[#1d4fd8]/40 text-[#1d4fd8] hover:bg-[#1d4fd8]/10"
                     >
                       Submit another enquiry
                     </Button>
@@ -189,7 +189,7 @@ export function Contact() {
                         placeholder="e.g. Ahmed Ali"
                         value={form.name}
                         onChange={(e) => set("name", e.target.value)}
-                        className="h-12 rounded-xl border-white/10 bg-white/5 focus-visible:ring-gold/50"
+                        className="h-12 rounded-xl border-[#0d1b33]/12 bg-white shadow-sm focus-visible:ring-[#1d4fd8]/40"
                         aria-invalid={!!errors.name}
                       />
                       {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
@@ -205,7 +205,7 @@ export function Contact() {
                         placeholder="you@example.com"
                         value={form.email}
                         onChange={(e) => set("email", e.target.value)}
-                        className="h-12 rounded-xl border-white/10 bg-white/5 focus-visible:ring-gold/50"
+                        className="h-12 rounded-xl border-[#0d1b33]/12 bg-white shadow-sm focus-visible:ring-[#1d4fd8]/40"
                         aria-invalid={!!errors.email}
                       />
                       {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
@@ -221,7 +221,7 @@ export function Contact() {
                         placeholder="+92 3XX XXXXXXX"
                         value={form.phone}
                         onChange={(e) => set("phone", e.target.value)}
-                        className="h-12 rounded-xl border-white/10 bg-white/5 focus-visible:ring-gold/50"
+                        className="h-12 rounded-xl border-[#0d1b33]/12 bg-white shadow-sm focus-visible:ring-[#1d4fd8]/40"
                         aria-invalid={!!errors.phone}
                       />
                       {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
@@ -234,11 +234,11 @@ export function Contact() {
                       <Select value={form.service} onValueChange={(v) => set("service", v)}>
                         <SelectTrigger
                           id="service"
-                          className="h-12 rounded-xl border-white/10 bg-white/5 data-[placeholder]:text-muted-foreground"
+                          className="h-12 rounded-xl border-[#0d1b33]/12 bg-white shadow-sm data-[placeholder]:text-[#8291ab]"
                         >
                           <SelectValue placeholder="Select a service" />
                         </SelectTrigger>
-                        <SelectContent className="border-white/10 bg-[#131318] text-foreground">
+                        <SelectContent className="border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-xl">
                           {SERVICES.map((s) => (
                             <SelectItem key={s.id} value={s.short}>
                               {s.short}
@@ -257,11 +257,11 @@ export function Contact() {
                       <Select value={form.destination} onValueChange={(v) => set("destination", v)}>
                         <SelectTrigger
                           id="destination"
-                          className="h-12 rounded-xl border-white/10 bg-white/5 data-[placeholder]:text-muted-foreground"
+                          className="h-12 rounded-xl border-[#0d1b33]/12 bg-white shadow-sm data-[placeholder]:text-[#8291ab]"
                         >
                           <SelectValue placeholder="Where do you want to go?" />
                         </SelectTrigger>
-                        <SelectContent className="border-white/10 bg-[#131318] text-foreground">
+                        <SelectContent className="border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-xl">
                           {DESTINATIONS.map((d) => (
                             <SelectItem key={d.id} value={d.country}>
                               {d.country}
@@ -283,7 +283,7 @@ export function Contact() {
                         rows={4}
                         value={form.message}
                         onChange={(e) => set("message", e.target.value)}
-                        className="resize-none rounded-xl border-white/10 bg-white/5 focus-visible:ring-gold/50"
+                        className="resize-none rounded-xl border-[#0d1b33]/12 bg-white shadow-sm focus-visible:ring-[#1d4fd8]/40"
                       />
                     </div>
 
@@ -292,7 +292,7 @@ export function Contact() {
                         type="submit"
                         disabled={submitting}
                         size="lg"
-                        className="group relative h-14 w-full overflow-hidden rounded-full bg-gold text-base font-bold text-[#17130a] shadow-[0_0_32px_rgba(232,182,76,0.35)] transition-shadow hover:shadow-[0_0_48px_rgba(232,182,76,0.55)] disabled:opacity-70"
+                        className="group relative h-14 w-full overflow-hidden rounded-full bg-[#1d4fd8] text-base font-bold text-white shadow-[0_16px_44px_-14px_rgba(29,79,216,0.9)] transition-all hover:bg-[#1a46c2] disabled:opacity-70"
                       >
                         <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                         {submitting ? (

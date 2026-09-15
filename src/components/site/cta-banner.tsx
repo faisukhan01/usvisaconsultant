@@ -24,13 +24,13 @@ export function CtaBanner() {
   return (
     <section ref={ref} className="relative px-4 py-10 sm:px-6">
       <Reveal>
-        <div className="noise relative mx-auto max-w-7xl overflow-hidden rounded-[2.5rem] border border-gold/20">
+        <div className="noise relative mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-gold/20 sm:rounded-[2.5rem]">
           {/* Video bg */}
           <motion.div style={{ scale }} className="absolute inset-0">
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/plane-through-clouds.mp4"
+              src="/videos/hero-flight.mp4"
               muted
               loop
               playsInline
@@ -39,16 +39,18 @@ export function CtaBanner() {
               aria-hidden="true"
             />
           </motion.div>
-          <div className="absolute inset-0 bg-[#08080a]/70" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#08080a]/85 via-transparent to-[#08080a]/85" />
+          <div className="absolute inset-0 bg-[#0a142e]/72" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a142e]/88 via-[#0a142e]/35 to-[#0a142e]/88" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5b85ec]/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#5b85ec]/50 to-transparent" />
 
-          <div className="relative z-10 flex flex-col items-center px-6 py-20 text-center sm:py-28">
-            <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-black/40 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-gold backdrop-blur-md">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-gold" />
+          <div className="relative z-10 flex flex-col items-center px-5 py-16 text-center sm:px-6 sm:py-28">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#5b85ec]/40 bg-[#0a142e]/55 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#9db9f9] backdrop-blur-md sm:text-[11px] sm:tracking-[0.22em]">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#9db9f9]" />
               Limited slots each week
             </span>
-            <h2 className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
-              Ready to secure <span className="text-gradient-gold font-serif-accent italic">your visa?</span>
+            <h2 className="mt-6 max-w-3xl font-display text-[26px] font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
+              Ready to secure <span className="text-gradient-light font-serif-accent italic">your visa?</span>
             </h2>
             <p className="mt-5 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
               Contact us today for expert assistance — and make your visa journey seamless,
@@ -58,7 +60,7 @@ export function CtaBanner() {
               <Button
                 asChild
                 size="lg"
-                className="group relative h-14 overflow-hidden rounded-full bg-gold px-9 text-base font-bold text-[#17130a] shadow-[0_0_40px_rgba(232,182,76,0.45)] hover:shadow-[0_0_60px_rgba(232,182,76,0.65)]"
+                className="group relative h-13 overflow-hidden rounded-full bg-[#1d4fd8] px-9 text-base font-bold text-white shadow-[0_16px_50px_-12px_rgba(29,79,216,0.95)] transition-all hover:bg-[#1a46c2] sm:h-14"
               >
                 <a href="#contact">
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />

@@ -38,9 +38,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Brand tokens — "gold" kept as legacy alias mapped to ROYAL BLUE (from logo) */
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
-  --color-jet: var(--jet);
+  --color-royal: var(--royal);
+  --color-royal-soft: var(--royal-soft);
+  --color-crimson: var(--crimson);
+  --color-ink: var(--ink);
+  --color-night: var(--night);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -49,41 +54,46 @@
 
 :root {
   --radius: 0.75rem;
-  /* Dark luxury: warm near-black + gold */
-  --background: #08080a;
-  --foreground: #f4f1ea;
-  --card: #101013;
-  --card-foreground: #f4f1ea;
-  --popover: #101013;
-  --popover-foreground: #f4f1ea;
-  --primary: #e8b64c;
-  --primary-foreground: #17130a;
-  --secondary: #1b1b20;
-  --secondary-foreground: #f4f1ea;
-  --muted: #1b1b20;
-  --muted-foreground: #a39e93;
-  --accent: #1b1b20;
-  --accent-foreground: #e8b64c;
-  --destructive: #e5484d;
-  --border: rgba(232, 182, 76, 0.14);
-  --input: rgba(244, 241, 234, 0.08);
-  --ring: rgba(232, 182, 76, 0.55);
-  --chart-1: #e8b64c;
-  --chart-2: #34d399;
-  --chart-3: #f4f1ea;
-  --chart-4: #fb923c;
-  --chart-5: #a39e93;
-  --sidebar: #101013;
-  --sidebar-foreground: #f4f1ea;
-  --sidebar-primary: #e8b64c;
-  --sidebar-primary-foreground: #17130a;
-  --sidebar-accent: #1b1b20;
-  --sidebar-accent-foreground: #f4f1ea;
-  --sidebar-border: rgba(232, 182, 76, 0.14);
-  --sidebar-ring: rgba(232, 182, 76, 0.55);
-  --gold: #e8b64c;
-  --gold-soft: #f5d38a;
-  --jet: #0c0c0f;
+  /* Light theme: white & royal blue (brand colors sampled from the official logo) */
+  --background: #f7f9fd;
+  --foreground: #0d1b33;
+  --card: #ffffff;
+  --card-foreground: #0d1b33;
+  --popover: #ffffff;
+  --popover-foreground: #0d1b33;
+  --primary: #1d4fd8;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2fa;
+  --secondary-foreground: #0d1b33;
+  --muted: #eef2fa;
+  --muted-foreground: #5a6a86;
+  --accent: #eaf0fd;
+  --accent-foreground: #1d4fd8;
+  --destructive: #dc2626;
+  --border: rgba(13, 27, 51, 0.1);
+  --input: rgba(13, 27, 51, 0.1);
+  --ring: rgba(29, 79, 216, 0.45);
+  --chart-1: #1d4fd8;
+  --chart-2: #16a34a;
+  --chart-3: #e23a3a;
+  --chart-4: #f07a22;
+  --chart-5: #5a6a86;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0d1b33;
+  --sidebar-primary: #1d4fd8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eaf0fd;
+  --sidebar-accent-foreground: #1d4fd8;
+  --sidebar-border: rgba(13, 27, 51, 0.1);
+  --sidebar-ring: rgba(29, 79, 216, 0.45);
+  /* brand */
+  --royal: #1d4fd8;
+  --royal-soft: #5b85ec;
+  --gold: #1d4fd8; /* legacy alias -> royal blue */
+  --gold-soft: #5b85ec; /* legacy alias -> light royal */
+  --crimson: #e23a3a;
+  --ink: #0d1b33;
+  --night: #0a142e;
 }
 
 @layer base {
@@ -93,13 +103,17 @@
   html {
     scroll-behavior: smooth;
   }
+  /* Anchor jumps land below the fixed navbar on every screen size */
+  section[id] {
+    scroll-margin-top: 88px;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     overflow-x: hidden;
   }
   ::selection {
-    background: rgba(232, 182, 76, 0.9);
-    color: #17130a;
+    background: rgba(29, 79, 216, 0.9);
+    color: #ffffff;
   }
 }
 
@@ -108,15 +122,15 @@
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0a0d;
+  background: #eef2f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #3a3325, #57472a);
+  background: linear-gradient(180deg, #b9cbf2, #7d9fee);
   border-radius: 8px;
-  border: 2px solid #0a0a0d;
+  border: 2px solid #eef2f9;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #57472a, #e8b64c);
+  background: linear-gradient(180deg, #7d9fee, #1d4fd8);
 }
 
 /* ---------- Utility classes ---------- */
@@ -128,16 +142,32 @@
   font-family: var(--font-playfair), Georgia, serif;
 }
 
+/* Royal-blue gradient text (light backgrounds) */
 .text-gradient-gold {
-  background: linear-gradient(115deg, #f9e2a8 0%, #e8b64c 38%, #b57e1f 62%, #f5d38a 100%);
+  background: linear-gradient(115deg, #1d4fd8 0%, #3b6ae8 45%, #6f96f2 80%, #1d4fd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+/* Light gradient text for over-video / dark sections */
+.text-gradient-light {
+  background: linear-gradient(115deg, #ffffff 0%, #cddcfe 45%, #8fb1f8 80%, #ffffff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(13, 27, 51, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Dark glass — for elements sitting on video / dark navy sections */
+.glass-dark {
+  background: rgba(10, 20, 46, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -151,7 +181,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(232, 182, 76, 0.55), rgba(232, 182, 76, 0.05) 40%, rgba(232, 182, 76, 0.05) 60%, rgba(232, 182, 76, 0.35));
+  background: linear-gradient(135deg, rgba(29, 79, 216, 0.55), rgba(29, 79, 216, 0.08) 40%, rgba(29, 79, 216, 0.08) 60%, rgba(91, 133, 236, 0.45));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -159,7 +189,7 @@
 }
 
 .glow-gold {
-  box-shadow: 0 0 24px rgba(232, 182, 76, 0.25), 0 0 80px rgba(232, 182, 76, 0.08);
+  box-shadow: 0 0 24px rgba(29, 79, 216, 0.28), 0 0 80px rgba(29, 79, 216, 0.12);
 }
 
 /* Noise film-grain overlay */
@@ -200,7 +230,7 @@
   width: 60%;
   height: 220%;
   transform: rotate(20deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(29, 79, 216, 0.07), transparent);
   transition: left 0.9s ease;
   pointer-events: none;
 }
@@ -244,11 +274,19 @@
   animation: dash-flow 1.2s linear infinite;
 }
 
-/* Grid backdrop */
+/* Grid backdrop (light blue) */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(232, 182, 76, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(232, 182, 76, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(29, 79, 216, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 79, 216, 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+/* Grid backdrop (dark navy sections) */
+.bg-grid-dark {
+  background-image:
+    linear-gradient(rgba(139, 171, 247, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 171, 247, 0.07) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 

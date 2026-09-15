@@ -2,9 +2,9 @@ export const SITE = {
   name: "US Visa Consultant",
   tagline: "Your Trusted Worldwide Visa Assistance Partner",
   email: "hello@usvisaconsultant.com",
-  phone: "+92 300 123 4567",
-  whatsapp: "+92 300 123 4567",
-  address: "Gulberg III, Lahore, Pakistan",
+  phone: "+92 312 4541361",
+  whatsapp: "+92 312 4541361",
+  address: "Office #G 29, City Star Shopping Mall, opposite Model Town link road, Lahore",
   hours: "Mon – Sat · 9:00 AM – 7:00 PM",
 };
 
@@ -12,7 +12,6 @@ export const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
-  { label: "Global Reach", href: "#global" },
   { label: "Process", href: "#process" },
   { label: "Destinations", href: "#destinations" },
   { label: "Testimonials", href: "#testimonials" },
@@ -268,22 +267,8 @@ export const TRUST_BADGES = [
 
 export const CONTACT_CHANNELS = [
   { icon: "mail", label: "Email Us", value: "hello@usvisaconsultant.com", href: "mailto:hello@usvisaconsultant.com" },
-  { icon: "phone", label: "Call / WhatsApp", value: "+92 300 123 4567", href: "tel:+923001234567" },
-  { icon: "map", label: "Visit Office", value: "Gulberg III, Lahore, Pakistan", href: "#contact" },
+  { icon: "phone", label: "Call / WhatsApp", value: "+92 312 4541361", href: "tel:+923124541361" },
+  { icon: "map", label: "Visit Office", value: "Office #G 29, City Star Shopping Mall, Model Town link road, Lahore", href: "#contact" },
   { icon: "clock", label: "Working Hours", value: "Mon – Sat · 9 AM – 7 PM", href: "#contact" },
 ];
 
-export const GLOBE_CITIES = [
-  { name: "Lahore", lat: 31.55, lon: 74.34, hub: true },
-  { name: "Karachi", lat: 24.86, lon: 67.0, hub: false },
-  { name: "Islamabad", lat: 33.68, lon: 73.05, hub: false },
-  { name: "Dubai", lat: 25.2, lon: 55.27, hub: false },
-  { name: "London", lat: 51.5, lon: -0.13, hub: false },
-  { name: "New York", lat: 40.71, lon: -74.01, hub: false },
-  { name: "Toronto", lat: 43.65, lon: -79.38, hub: false },
-  { name: "Sydney", lat: -33.87, lon: 151.21, hub: false },
-  { name: "Paris", lat: 48.86, lon: 2.35, hub: false },
-  { name: "Frankfurt", lat: 50.11, lon: 8.68, hub: false },
-  { name: "Singapore", lat: 1.35, lon: 103.82, hub: false },
-  { name: "Istanbul", lat: 41.01, lon: 28.98, hub: false },
-];
