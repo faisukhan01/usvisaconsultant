@@ -52,11 +52,11 @@ export function Hero() {
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — Manhattan skyline at dusk */}
+      {/* Cinematic background — airliner cruising above the clouds */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-nyc-poster.jpg"
+          src="/images/hero-plane-poster.jpg"
           alt=""
           fill
           priority
@@ -69,8 +69,8 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-nyc-poster.jpg"
-          src="/videos/hero-nyc-dusk.mp4"
+          poster="/images/hero-plane-poster.jpg"
+          src="/videos/hero-plane-flight.mp4"
           muted
           loop
           playsInline
