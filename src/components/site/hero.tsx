@@ -40,23 +40,39 @@ export function Hero() {
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
-  // Autoplay fallback
+  // Start playback ONLY once the browser estimates it can play through
+  // without stalling (canplaythrough). Firing too early = 2s-then-freeze on
+  // slower connections; the poster covers the page until frames really move.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const tryPlay = () => v.play().catch(() => undefined);
-    tryPlay();
-    v.addEventListener("canplay", tryPlay);
-    return () => v.removeEventListener("canplay", tryPlay);
+    let cancelled = false;
+    const start = () => {
+      if (!cancelled) v.play().catch(() => undefined);
+    };
+    if (v.readyState >= 4) {
+      start();
+    } else {
+      v.addEventListener("canplaythrough", start, { once: true });
+      const fallback = setTimeout(start, 8000);
+      return () => {
+        cancelled = true;
+        v.removeEventListener("canplaythrough", start);
+        clearTimeout(fallback);
+      };
+    }
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — airliner flying past sunset clouds */}
+      {/* Cinematic background — real-flight journey: dusk takeoff → flyover → cruise → landing */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-flight-journey-poster.jpg"
+          src="/images/hero-flight-story-poster.jpg"
           alt=""
           fill
           priority
@@ -69,14 +85,13 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-flight-journey-poster.jpg"
-          src="/videos/hero-flight-journey.mp4"
+          poster="/images/hero-flight-story-poster.jpg"
+          src="/videos/hero-flight-story.mp4"
           muted
           loop
           playsInline
-          autoPlay
           preload="auto"
-          onCanPlay={() => setVideoReady(true)}
+          onPlaying={() => setVideoReady(true)}
           aria-hidden="true"
         />
       </motion.div>

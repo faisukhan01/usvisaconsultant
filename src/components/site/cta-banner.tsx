@@ -12,13 +12,20 @@ export function CtaBanner() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
 
+  // Lazy-load: the banner only downloads/starts the video when it scrolls into
+  // view, so it never competes with the hero video for bandwidth on slow links.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const tryPlay = () => v.play().catch(() => undefined);
-    tryPlay();
-    v.addEventListener("canplay", tryPlay);
-    return () => v.removeEventListener("canplay", tryPlay);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) v.play().catch(() => undefined);
+        else v.pause();
+      },
+      { threshold: 0.25 }
+    );
+    io.observe(v);
+    return () => io.disconnect();
   }, []);
 
   return (
@@ -30,12 +37,11 @@ export function CtaBanner() {
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/hero-flight-journey.mp4"
+              src="/videos/hero-flight-story.mp4"
               muted
               loop
               playsInline
-              autoPlay
-              preload="metadata"
+              preload="none"
               aria-hidden="true"
             />
           </motion.div>
