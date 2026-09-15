@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle2, Loader2, BadgeCheck } from "lucide-react";
 import { Reveal, SectionHeading } from "@/components/site/reveal";
@@ -30,11 +30,48 @@ const CHANNEL_ICONS: Record<string, typeof Mail> = {
   clock: Clock,
 };
 
+/** Live open/closed status for the Lahore office (Mon–Sat, 9:00–19:00 PKT) */
+function useOfficeOpen() {
+  const [state, setState] = useState<{ open: boolean; label: string } | null>(null);
+
+  useEffect(() => {
+    const compute = () => {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Karachi",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      }).formatToParts(new Date());
+      const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+      const weekday = get("weekday");
+      const hour = parseInt(get("hour"), 10);
+      const minute = parseInt(get("minute"), 10);
+      const isWeekday = !["Sun"].includes(weekday);
+      const mins = hour * 60 + minute;
+      const open = isWeekday && mins >= 9 * 60 && mins < 19 * 60;
+      setState({
+        open,
+        label: open ? "Open now · closes 7 PM" : isWeekday ? "Closed · opens 9 AM" : "Closed · opens Monday 9 AM",
+      });
+    };
+    compute();
+    const t = setInterval(compute, 60_000);
+    return () => clearInterval(t);
+  }, []);
+
+  return state;
+}
+
+const MAP_EMBED_URL =
+  "https://www.google.com/maps?q=City+Star+Shopping+Mall,+Model+Town+Link+Road,+Lahore,+Pakistan&output=embed";
+
 export function Contact() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const office = useOfficeOpen();
   const { toast } = useToast();
 
   const set = (key: keyof FormState, value: string) => {
@@ -133,6 +170,40 @@ export function Contact() {
                   No fees, no obligation — just an honest assessment of your case and your best route
                   forward.
                 </p>
+              </div>
+            </Reveal>
+
+            {/* Live office status + location map */}
+            <Reveal delay={0.36}>
+              <div className="overflow-hidden rounded-2xl border border-[#0d1b33]/8 bg-white shadow-[0_14px_40px_-28px_rgba(13,27,51,0.4)]">
+                <div className="flex items-center justify-between gap-3 px-5 pb-3 pt-4">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
+                      {office?.open && (
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
+                      )}
+                      <span
+                        className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
+                          office?.open ? "bg-emerald-500" : "bg-[#8291ab]"
+                        }`}
+                      />
+                    </span>
+                    <p className="truncate text-[13px] font-bold text-[#0d1b33]">
+                      {office ? office.label : "Mon – Sat · 9 AM – 7 PM"}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-[#f0f4fd] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1d4fd8]">
+                    PKT
+                  </span>
+                </div>
+                <iframe
+                  src={MAP_EMBED_URL}
+                  title="US Visa Consultant office location — City Star Shopping Mall, Lahore"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  className="h-44 w-full border-0 sm:h-52"
+                  allowFullScreen
+                />
               </div>
             </Reveal>
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { Menu, X, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,35 @@ import { NAV_LINKS, SITE } from "@/lib/site-data";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [active, setActive] = useState<string>("#home");
   const [open, setOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 26, restDelta: 0.001 });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Scroll-spy: highlight the section currently in view
+  useEffect(() => {
+    const ids = NAV_LINKS.map((l) => l.href.slice(1));
+    const sections = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!sections.length) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(`#${entry.target.id}`);
+        }
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -65,16 +87,24 @@ export function Navbar() {
 
           {/* Desktop links */}
           <ul className="hidden items-center gap-1 xl:flex">
-            {NAV_LINKS.slice(0, 7).map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  className="relative rounded-full px-3.5 py-2 text-[13px] font-semibold text-[#3d4d6b] transition-colors hover:text-[#1d4fd8] after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-[#1d4fd8] after:transition-transform hover:after:scale-x-100"
-                >
-                  {l.label}
-                </a>
-              </li>
-            ))}
+            {NAV_LINKS.slice(0, 7).map((l) => {
+              const isActive = active === l.href;
+              return (
+                <li key={l.href}>
+                  <a
+                    href={l.href}
+                    aria-current={isActive ? "true" : undefined}
+                    className={`relative rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors after:absolute after:inset-x-3.5 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-[#1d4fd8] after:transition-transform ${
+                      isActive
+                        ? "text-[#1d4fd8] after:scale-x-100"
+                        : "text-[#3d4d6b] after:scale-x-0 hover:text-[#1d4fd8] hover:after:scale-x-100"
+                    }`}
+                  >
+                    {l.label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
 
           <div className="flex items-center gap-3">
@@ -126,7 +156,11 @@ export function Navbar() {
                       initial={{ opacity: 0, x: 24 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.04 * i }}
-                      className="group flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-semibold text-[#3d4d6b] transition-colors hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
+                      className={`group flex items-center justify-between rounded-xl px-4 py-3 text-[15px] font-semibold transition-colors ${
+                        active === l.href
+                          ? "bg-[#1d4fd8]/8 text-[#1d4fd8]"
+                          : "text-[#3d4d6b] hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
+                      }`}
                     >
                       {l.label}
                       <span className="text-xs text-[#1d4fd8]/60 opacity-0 transition-opacity group-hover:opacity-100">
@@ -152,6 +186,13 @@ export function Navbar() {
           </div>
         </nav>
       </div>
+
+      {/* Scroll progress indicator */}
+      <motion.div
+        aria-hidden="true"
+        style={{ scaleX: progress }}
+        className="h-[2.5px] origin-left bg-gradient-to-r from-[#1d4fd8] via-[#3b6ae8] to-[#5b85ec]"
+      />
     </motion.header>
   );
 }
