@@ -7,6 +7,7 @@ import { Process } from "@/components/site/process";
 import { Eligibility } from "@/components/site/eligibility";
 import { Destinations } from "@/components/site/destinations";
 import { Testimonials } from "@/components/site/testimonials";
+import { Booking } from "@/components/site/booking";
 import { CtaBanner } from "@/components/site/cta-banner";
 import { Contact } from "@/components/site/contact";
 import { Faq } from "@/components/site/faq";
@@ -26,6 +27,7 @@ export default function Home() {
         <Eligibility />
         <Destinations />
         <Testimonials />
+        <Booking />
         <CtaBanner />
         <Contact />
         <Faq />

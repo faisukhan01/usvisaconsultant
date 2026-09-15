@@ -112,7 +112,7 @@ export function Navbar() {
               asChild
               className="group relative hidden overflow-hidden rounded-full bg-[#1d4fd8] font-semibold text-white shadow-[0_8px_28px_-8px_rgba(29,79,216,0.7)] transition-all hover:bg-[#1a46c2] hover:shadow-[0_10px_36px_-8px_rgba(29,79,216,0.85)] sm:inline-flex"
             >
-              <a href="#contact">
+              <a href="#booking">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 <Sparkles className="mr-1.5 h-4 w-4" />
                 Free Consultation

@@ -631,7 +631,7 @@ export function Eligibility() {
                         asChild
                         className="h-11 rounded-full bg-[#1d4fd8] text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(29,79,216,0.7)] hover:bg-[#1a46c2]"
                       >
-                        <a href="#contact">
+                        <a href="#booking">
                           <CalendarCheck className="mr-1.5 h-4 w-4" />
                           Book Free Consultation
                         </a>

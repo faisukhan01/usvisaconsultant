@@ -30,7 +30,7 @@ export function CtaBanner() {
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/hero-plane-flight.mp4"
+              src="/videos/hero-plane-real.mp4"
               muted
               loop
               playsInline
@@ -62,7 +62,7 @@ export function CtaBanner() {
                 size="lg"
                 className="group relative h-13 overflow-hidden rounded-full bg-[#1d4fd8] px-9 text-base font-bold text-white shadow-[0_16px_50px_-12px_rgba(29,79,216,0.95)] transition-all hover:bg-[#1a46c2] sm:h-14"
               >
-                <a href="#contact">
+                <a href="#booking">
                   <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                   Get Started Now
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />

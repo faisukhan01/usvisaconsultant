@@ -42,3 +42,18 @@ model EligibilityCheck {
   status      String   @default("new")
   createdAt   DateTime @default(now())
 }
+
+model Booking {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  visaType  String
+  date      String
+  slot      String
+  notes     String   @default("")
+  status    String   @default("confirmed")
+  createdAt DateTime @default(now())
+
+  @@unique([date, slot])
+}

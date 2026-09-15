@@ -52,11 +52,11 @@ export function Hero() {
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — airliner cruising above the clouds */}
+      {/* Cinematic background — airliner flying past sunset clouds */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-plane-poster.jpg"
+          src="/images/hero-plane-real-poster.jpg"
           alt=""
           fill
           priority
@@ -69,8 +69,8 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-plane-poster.jpg"
-          src="/videos/hero-plane-flight.mp4"
+          poster="/images/hero-plane-real-poster.jpg"
+          src="/videos/hero-plane-real.mp4"
           muted
           loop
           playsInline
@@ -151,7 +151,7 @@ export function Hero() {
               size="lg"
               className="group relative h-13 w-full overflow-hidden rounded-full bg-[#1d4fd8] px-8 text-[15px] font-bold text-white shadow-[0_18px_44px_-14px_rgba(29,79,216,0.75)] transition-all hover:bg-[#1a46c2] sm:h-14 sm:w-auto sm:px-9"
             >
-              <a href="#contact">
+              <a href="#booking">
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
                 Free Consultation
                 <ArrowRight className="ml-2 h-4.5 w-4.5 transition-transform group-hover:translate-x-1" />
