@@ -87,7 +87,7 @@ export function Navbar() {
 
           {/* Desktop links */}
           <ul className="hidden items-center gap-1 xl:flex">
-            {NAV_LINKS.slice(0, 7).map((l) => {
+            {NAV_LINKS.slice(0, 8).map((l) => {
               const isActive = active === l.href;
               return (
                 <li key={l.href}>

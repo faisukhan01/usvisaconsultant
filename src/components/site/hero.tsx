@@ -201,7 +201,7 @@ export function Hero() {
               key={s.label}
               className={`flex flex-col items-center gap-0.5 text-center ${
                 i > 0 ? "md:border-l md:border-[#0d1b33]/10" : ""
-              }`}
+              } ${i % 2 === 1 ? "pr-16 sm:pr-14 md:pr-0" : ""}`}
             >
               <span className="font-display text-2xl font-extrabold leading-none text-[#1d4fd8] sm:text-3xl">
                 <Counter value={s.value} suffix={s.suffix} />

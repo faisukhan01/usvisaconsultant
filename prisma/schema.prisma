@@ -28,3 +28,17 @@ model Newsletter {
   email     String   @unique
   createdAt DateTime @default(now())
 }
+
+model EligibilityCheck {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String
+  goal        String
+  destination String
+  timeline    String
+  refusals    String
+  readiness   String
+  status      String   @default("new")
+  createdAt   DateTime @default(now())
+}

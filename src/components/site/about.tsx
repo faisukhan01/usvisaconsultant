@@ -71,7 +71,7 @@ export function About() {
                     Ume Salma
                     <span className="ml-2 text-xs font-semibold text-[#1d4fd8]">Founder & Lead Consultant</span>
                   </p>
-                  <p className="mt-0.5 truncate text-[13px] italic text-[#5a6a86]">
+                  <p className="mt-0.5 text-[13px] italic leading-snug text-[#5a6a86]">
                     “We build futures, one approved visa at a time.”
                   </p>
                 </div>

@@ -4,6 +4,7 @@ import { Marquee } from "@/components/site/marquee";
 import { About } from "@/components/site/about";
 import { Services } from "@/components/site/services";
 import { Process } from "@/components/site/process";
+import { Eligibility } from "@/components/site/eligibility";
 import { Destinations } from "@/components/site/destinations";
 import { Testimonials } from "@/components/site/testimonials";
 import { CtaBanner } from "@/components/site/cta-banner";
@@ -22,6 +23,7 @@ export default function Home() {
         <About />
         <Services />
         <Process />
+        <Eligibility />
         <Destinations />
         <Testimonials />
         <CtaBanner />
