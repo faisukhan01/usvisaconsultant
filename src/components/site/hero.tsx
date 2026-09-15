@@ -72,7 +72,7 @@ export function Hero() {
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-flight-story-poster.jpg"
+          src="/images/hero-sky-journey-poster.jpg"
           alt=""
           fill
           priority
@@ -85,8 +85,8 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-flight-story-poster.jpg"
-          src="/videos/hero-flight-story.mp4"
+          poster="/images/hero-sky-journey-poster.jpg"
+          src="/videos/hero-sky-journey.mp4"
           muted
           loop
           playsInline
