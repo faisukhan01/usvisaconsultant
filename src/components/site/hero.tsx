@@ -84,11 +84,11 @@ export function Hero() {
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — real-flight journey: daylight takeoff → flyover → cruise → landing */}
+      {/* Cinematic background — real-flight journey: wing over land & lake → airliner above a sunlit cloud sea → cloud-sea approach */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-sky-flight-poster.jpg"
+          src="/images/hero-plane-journey-poster.jpg"
           alt=""
           fill
           priority
@@ -101,8 +101,8 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-sky-flight-poster.jpg"
-          src="/videos/hero-sky-flight.mp4"
+          poster="/images/hero-plane-journey-poster.jpg"
+          src="/videos/hero-plane-journey.mp4"
           muted
           loop
           playsInline
