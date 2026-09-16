@@ -50,7 +50,7 @@ export function CtaBanner() {
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/hero-plane-journey.mp4"
+              src="/videos/hero-plane-cruise.mp4"
               muted
               loop
               playsInline
