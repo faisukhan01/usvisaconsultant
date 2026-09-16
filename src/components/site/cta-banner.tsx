@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/site/reveal";
+import { attachStallGuard, canStartSmoothly } from "@/lib/video-playback";
 
 export function CtaBanner() {
   const ref = useRef<HTMLDivElement>(null);
@@ -12,33 +13,55 @@ export function CtaBanner() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
 
-  // Lazy-load: the banner only downloads the video when it scrolls into view,
-  // and waits for a full-buffer estimate (canplaythrough) before its first
-  // play — so it never stalls mid-animation or competes with the hero.
+  // Lazy-load + stall-proof playback: the banner only downloads the video
+  // once it scrolls into view, and starts ONLY when the buffer is genuinely
+  // deep — never on the browser's optimistic canplaythrough estimate, which
+  // is what caused mid-animation freezes on slow connections. The stall
+  // guard recovers playback if the network dips while visible.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let started = false;
-    const begin = () => v.play().catch(() => undefined);
+    let visible = false;
+
+    const begin = () => {
+      if (visible && v.paused && canStartSmoothly(v, 8)) {
+        v.play().catch(() => undefined);
+      }
+    };
+    const onData = () => begin();
+
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          if (!started) {
-            started = true;
-            v.load(); // kick off the fetch (preload="none")
-            if (v.readyState >= 4) begin();
-            else v.addEventListener("canplaythrough", begin, { once: true });
-          } else {
-            begin();
-          }
-        } else {
+        visible = entry.isIntersecting;
+        if (!visible) {
           v.pause();
+          return;
         }
+        if (!started) {
+          started = true;
+          v.load(); // kick off the fetch (preload="none")
+        }
+        begin();
       },
-      { threshold: 0.25 }
+      { threshold: 0.25 },
     );
+
     io.observe(v);
-    return () => io.disconnect();
+    v.addEventListener("loadeddata", onData);
+    v.addEventListener("canplay", onData);
+    v.addEventListener("progress", onData);
+    const detachGuard = attachStallGuard(v);
+    const poll = window.setInterval(begin, 800);
+
+    return () => {
+      io.disconnect();
+      window.clearInterval(poll);
+      v.removeEventListener("loadeddata", onData);
+      v.removeEventListener("canplay", onData);
+      v.removeEventListener("progress", onData);
+      detachGuard();
+    };
   }, []);
 
   return (
@@ -50,7 +73,7 @@ export function CtaBanner() {
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/hero-plane-flyby.mp4"
+              src="/videos/hero-flight-loop.mp4"
               muted
               loop
               playsInline

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HERO_STATS } from "@/lib/site-data";
+import { attachStallGuard, canStartSmoothly } from "@/lib/video-playback";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -40,45 +41,74 @@ export function Hero() {
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
-  // Zero-stall playback policy: start ONLY when the ENTIRE file is buffered
-  // (not just the browser's optimistic canplaythrough estimate). Once fully
-  // local, the video physically cannot stall — loop included. The poster
-  // covers the page until then; a 12s fallback starts playback regardless on
-  // very slow links (the browser then rebuffers transparently if needed).
+  // Stall-proof playback policy (root-cause fix for "freezes after ~2s"):
+  // NEVER start on a timer or on the browser's optimistic canplaythrough —
+  // on iOS / data-saver / weak cellular those fire with only ~1.5–2s of
+  // media buffered, which is exactly how far it played before freezing.
+  // We start only when the buffer is genuinely deep. Devices that defer
+  // prefetching get "primed" (muted play→pause) so the fetch begins, the
+  // poster covers the page until smooth playback actually runs, and a stall
+  // guard recovers playback if the network dips later. See video-playback.ts.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let cancelled = false;
-    let fallback: ReturnType<typeof setTimeout> | undefined;
 
-    const fullyBuffered = () => {
-      const b = v.buffered;
-      return b.length > 0 && b.end(b.length - 1) >= v.duration - 0.25;
-    };
-    const start = () => {
-      if (!cancelled) v.play().catch(() => undefined);
-    };
-    const onProgress = () => {
-      if (fullyBuffered()) {
-        v.removeEventListener("progress", onProgress);
-        if (fallback) clearTimeout(fallback);
-        start();
+    const tryStart = () => {
+      if (cancelled || !v.paused) return;
+      if (canStartSmoothly(v)) {
+        v.play()
+          .then(() => setVideoReady(true))
+          .catch(() => undefined);
       }
     };
+    const onData = () => tryStart();
 
-    if (fullyBuffered()) {
-      start();
-    } else {
-      v.addEventListener("progress", onProgress);
-      fallback = setTimeout(() => {
-        v.removeEventListener("progress", onProgress);
-        start();
-      }, 12000);
-    }
+    // Prime: if the browser refuses to prefetch (readyState stuck at 0/1 —
+    // typical iOS Safari / data-saver behaviour), a muted play()+pause()
+    // forces the data to start flowing. The video is still invisible, so
+    // the user never sees this flash; the poster stays until the buffer is
+    // deep enough for an uninterrupted start.
+    const prime = () => {
+      if (cancelled || canStartSmoothly(v)) return;
+      v.play()
+        .then(() => {
+          if (!cancelled && !canStartSmoothly(v)) v.pause();
+        })
+        .catch(() => undefined);
+    };
+
+    const onPlaying = () => {
+      if (cancelled) return;
+      if (canStartSmoothly(v)) setVideoReady(true);
+      else if (!v.paused) v.pause(); // prime flash — stay on the poster
+    };
+
+    v.addEventListener("loadeddata", onData);
+    v.addEventListener("canplay", onData);
+    v.addEventListener("progress", onData);
+    v.addEventListener("playing", onPlaying);
+    const detachGuard = attachStallGuard(v);
+
+    const poll = window.setInterval(tryStart, 800);
+    const primeTimer = window.setTimeout(prime, 2500);
+    // Autoplay policies that require a gesture (e.g. iOS Low Power Mode):
+    // retry on the first tap/click anywhere on the page.
+    const onGesture = () => tryStart();
+    window.addEventListener("pointerdown", onGesture);
+
+    tryStart();
+
     return () => {
       cancelled = true;
-      v.removeEventListener("progress", onProgress);
-      if (fallback) clearTimeout(fallback);
+      window.clearInterval(poll);
+      window.clearTimeout(primeTimer);
+      window.removeEventListener("pointerdown", onGesture);
+      v.removeEventListener("loadeddata", onData);
+      v.removeEventListener("canplay", onData);
+      v.removeEventListener("progress", onData);
+      v.removeEventListener("playing", onPlaying);
+      detachGuard();
     };
   }, []);
 
@@ -102,12 +132,11 @@ export function Hero() {
             videoReady ? "opacity-100" : "opacity-0"
           }`}
           poster="/images/hero-plane-flyby-poster.jpg"
-          src="/videos/hero-plane-flyby.mp4"
+          src="/videos/hero-flight-loop.mp4"
           muted
           loop
           playsInline
           preload="auto"
-          onPlaying={() => setVideoReady(true)}
           aria-hidden="true"
         />
       </motion.div>
