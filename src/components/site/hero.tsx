@@ -40,39 +40,55 @@ export function Hero() {
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
-  // Start playback ONLY once the browser estimates it can play through
-  // without stalling (canplaythrough). Firing too early = 2s-then-freeze on
-  // slower connections; the poster covers the page until frames really move.
+  // Zero-stall playback policy: start ONLY when the ENTIRE file is buffered
+  // (not just the browser's optimistic canplaythrough estimate). Once fully
+  // local, the video physically cannot stall — loop included. The poster
+  // covers the page until then; a 12s fallback starts playback regardless on
+  // very slow links (the browser then rebuffers transparently if needed).
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let cancelled = false;
+    let fallback: ReturnType<typeof setTimeout> | undefined;
+
+    const fullyBuffered = () => {
+      const b = v.buffered;
+      return b.length > 0 && b.end(b.length - 1) >= v.duration - 0.25;
+    };
     const start = () => {
       if (!cancelled) v.play().catch(() => undefined);
     };
-    if (v.readyState >= 4) {
+    const onProgress = () => {
+      if (fullyBuffered()) {
+        v.removeEventListener("progress", onProgress);
+        if (fallback) clearTimeout(fallback);
+        start();
+      }
+    };
+
+    if (fullyBuffered()) {
       start();
     } else {
-      v.addEventListener("canplaythrough", start, { once: true });
-      const fallback = setTimeout(start, 8000);
-      return () => {
-        cancelled = true;
-        v.removeEventListener("canplaythrough", start);
-        clearTimeout(fallback);
-      };
+      v.addEventListener("progress", onProgress);
+      fallback = setTimeout(() => {
+        v.removeEventListener("progress", onProgress);
+        start();
+      }, 12000);
     }
     return () => {
       cancelled = true;
+      v.removeEventListener("progress", onProgress);
+      if (fallback) clearTimeout(fallback);
     };
   }, []);
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — real-flight journey: dusk takeoff → flyover → cruise → landing */}
+      {/* Cinematic background — real-flight journey: daylight takeoff → flyover → cruise → landing */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-sky-journey-poster.jpg"
+          src="/images/hero-sky-flight-poster.jpg"
           alt=""
           fill
           priority
@@ -85,8 +101,8 @@ export function Hero() {
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-sky-journey-poster.jpg"
-          src="/videos/hero-sky-journey.mp4"
+          poster="/images/hero-sky-flight-poster.jpg"
+          src="/videos/hero-sky-flight.mp4"
           muted
           loop
           playsInline
