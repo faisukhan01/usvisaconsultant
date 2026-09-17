@@ -55,6 +55,39 @@ export function canStartSmoothly(
 }
 
 /**
+ * Whole-file blob preload for the hero footage.
+ *
+ * The last remaining real-world stall source is the network itself: even a
+ * "deep" progressive buffer can silently fall behind on flaky mobile links,
+ * and every mid-playback pause a user sees reads as "the video is stuck".
+ * Fetching the file as a Blob and assigning an object URL removes that
+ * entire failure class — once playback starts it runs entirely from memory,
+ * the loop seam costs zero network, and hero + CTA share ONE download.
+ */
+const HERO_VIDEO_SRC = "/videos/hero-sky-cruise-hd.mp4";
+
+let blobUrlPromise: Promise<string | null> | null = null;
+
+export function loadHeroVideoBlob(): Promise<string | null> {
+  if (!blobUrlPromise) {
+    blobUrlPromise = fetch(HERO_VIDEO_SRC)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.blob();
+      })
+      .then((blob) => URL.createObjectURL(blob))
+      .catch(() => {
+        // Network hiccup — reset so a later attempt (next gesture, or the
+        // CTA scrolling into view) can retry the download. Until then the
+        // poster carries the design on its own.
+        blobUrlPromise = null;
+        return null;
+      });
+  }
+  return blobUrlPromise;
+}
+
+/**
  * Watch for mid-playback stalls. If `waiting` persists and the buffer has
  * run dry, pause deterministically; resume as soon as 3s of media are
  * available again. Returns a detach function.

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ArrowRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HERO_STATS } from "@/lib/site-data";
-import { attachStallGuard, canStartSmoothly } from "@/lib/video-playback";
+import { attachStallGuard, canStartSmoothly, loadHeroVideoBlob } from "@/lib/video-playback";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -41,21 +41,20 @@ export function Hero() {
   const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
 
-  // Stall-proof playback policy (root-cause fix for "freezes after ~2s"):
-  // NEVER start on a timer or on the browser's optimistic canplaythrough —
-  // on iOS / data-saver / weak cellular those fire with only ~1.5–2s of
-  // media buffered, which is exactly how far it played before freezing.
-  // We start only when the buffer is genuinely deep. Devices that defer
-  // prefetching get "primed" (muted play→pause) so the fetch begins, the
-  // poster covers the page until smooth playback actually runs, and a stall
-  // guard recovers playback if the network dips later. See video-playback.ts.
+  // Stall-proof playback, mark III. The whole file is fetched as a Blob
+  // before playback is ever attempted, so an in-memory source — streaming
+  // stalls become physically impossible, the loop seam costs zero network
+  // and mid-play pauses cannot happen even on flaky mobile links. Until
+  // the blob is ready the poster (the same scene) covers the hero, so the
+  // crossfade is invisible. Buffer gate + stall guard remain as pure
+  // safety nets. See video-playback.ts.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let cancelled = false;
 
     const tryStart = () => {
-      if (cancelled || !v.paused) return;
+      if (cancelled || !v.paused || !v.src) return;
       if (canStartSmoothly(v)) {
         v.play()
           .then(() => setVideoReady(true))
@@ -64,24 +63,10 @@ export function Hero() {
     };
     const onData = () => tryStart();
 
-    // Prime: if the browser refuses to prefetch (readyState stuck at 0/1 —
-    // typical iOS Safari / data-saver behaviour), a muted play()+pause()
-    // forces the data to start flowing. The video is still invisible, so
-    // the user never sees this flash; the poster stays until the buffer is
-    // deep enough for an uninterrupted start.
-    const prime = () => {
-      if (cancelled || canStartSmoothly(v)) return;
-      v.play()
-        .then(() => {
-          if (!cancelled && !canStartSmoothly(v)) v.pause();
-        })
-        .catch(() => undefined);
-    };
-
     const onPlaying = () => {
       if (cancelled) return;
       if (canStartSmoothly(v)) setVideoReady(true);
-      else if (!v.paused) v.pause(); // prime flash — stay on the poster
+      else if (!v.paused) v.pause();
     };
 
     v.addEventListener("loadeddata", onData);
@@ -89,20 +74,33 @@ export function Hero() {
     v.addEventListener("progress", onData);
     v.addEventListener("playing", onPlaying);
     const detachGuard = attachStallGuard(v);
-
     const poll = window.setInterval(tryStart, 800);
-    const primeTimer = window.setTimeout(prime, 2500);
+
     // Autoplay policies that require a gesture (e.g. iOS Low Power Mode):
-    // retry on the first tap/click anywhere on the page.
-    const onGesture = () => tryStart();
+    // a tap anywhere retries the download (if it failed) and playback.
+    const onGesture = () => {
+      if (!v.src) {
+        void loadHeroVideoBlob().then((url) => {
+          if (cancelled || !url || v.src) return;
+          v.src = url;
+          v.load();
+          tryStart();
+        });
+      }
+      tryStart();
+    };
     window.addEventListener("pointerdown", onGesture);
 
-    tryStart();
+    void loadHeroVideoBlob().then((url) => {
+      if (cancelled || !url) return; // offline: the poster carries the hero
+      v.src = url;
+      v.load();
+      tryStart();
+    });
 
     return () => {
       cancelled = true;
       window.clearInterval(poll);
-      window.clearTimeout(primeTimer);
       window.removeEventListener("pointerdown", onGesture);
       v.removeEventListener("loadeddata", onData);
       v.removeEventListener("canplay", onData);
@@ -118,7 +116,7 @@ export function Hero() {
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-sky-cruise-poster.jpg"
+          src="/images/hero-sky-cruise-hd-poster.jpg"
           alt=""
           fill
           priority
@@ -126,13 +124,13 @@ export function Hero() {
           className="object-cover object-[62%_50%]"
           aria-hidden="true"
         />
+        {/* src is attached from the in-memory blob once the fetch completes */}
         <video
           ref={videoRef}
           className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-sky-cruise-poster.jpg"
-          src="/videos/hero-sky-cruise.mp4"
+          poster="/images/hero-sky-cruise-hd-poster.jpg"
           muted
           loop
           playsInline

@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/site/reveal";
-import { attachStallGuard, canStartSmoothly } from "@/lib/video-playback";
+import { attachStallGuard, canStartSmoothly, loadHeroVideoBlob } from "@/lib/video-playback";
 
 export function CtaBanner() {
   const ref = useRef<HTMLDivElement>(null);
@@ -13,19 +13,19 @@ export function CtaBanner() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
 
-  // Lazy-load + stall-proof playback: the banner only downloads the video
-  // once it scrolls into view, and starts ONLY when the buffer is genuinely
-  // deep — never on the browser's optimistic canplaythrough estimate, which
-  // is what caused mid-animation freezes on slow connections. The stall
-  // guard recovers playback if the network dips while visible.
+  // Lazy + stall-proof: the banner shares the hero's in-memory blob (one
+  // download for the whole page — see loadHeroVideoBlob), attaches it only
+  // when scrolled into view, and starts only when the buffer is genuinely
+  // deep. The stall guard recovers playback if anything ever dips.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
+    let cancelled = false;
     let started = false;
     let visible = false;
 
     const begin = () => {
-      if (visible && v.paused && canStartSmoothly(v, 8)) {
+      if (visible && !cancelled && v.paused && v.src && canStartSmoothly(v)) {
         v.play().catch(() => undefined);
       }
     };
@@ -40,7 +40,12 @@ export function CtaBanner() {
         }
         if (!started) {
           started = true;
-          v.load(); // kick off the fetch (preload="none")
+          void loadHeroVideoBlob().then((url) => {
+            if (cancelled || !url) return;
+            v.src = url;
+            v.load();
+            begin();
+          });
         }
         begin();
       },
@@ -55,6 +60,7 @@ export function CtaBanner() {
     const poll = window.setInterval(begin, 800);
 
     return () => {
+      cancelled = true;
       io.disconnect();
       window.clearInterval(poll);
       v.removeEventListener("loadeddata", onData);
@@ -70,14 +76,14 @@ export function CtaBanner() {
         <div className="noise relative mx-auto max-w-7xl overflow-hidden rounded-[1.75rem] border border-gold/20 sm:rounded-[2.5rem]">
           {/* Video bg */}
           <motion.div style={{ scale }} className="absolute inset-0">
+            {/* src is attached from the shared in-memory blob on visibility */}
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
-              src="/videos/hero-sky-cruise.mp4"
               muted
               loop
               playsInline
-              preload="none"
+              preload="auto"
               aria-hidden="true"
             />
           </motion.div>
