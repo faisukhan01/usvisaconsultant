@@ -91,6 +91,13 @@ export function Hero() {
     };
     window.addEventListener("pointerdown", onGesture);
 
+    // Returning to the tab/app: browsers may leave the video paused after
+    // backgrounding — resume immediately so it never reads as "stopped".
+    const onVisibility = () => {
+      if (!document.hidden) tryStart();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
     void loadHeroVideoBlob().then((url) => {
       if (cancelled || !url) return; // offline: the poster carries the hero
       v.src = url;
@@ -102,6 +109,7 @@ export function Hero() {
       cancelled = true;
       window.clearInterval(poll);
       window.removeEventListener("pointerdown", onGesture);
+      document.removeEventListener("visibilitychange", onVisibility);
       v.removeEventListener("loadeddata", onData);
       v.removeEventListener("canplay", onData);
       v.removeEventListener("progress", onData);
@@ -112,25 +120,28 @@ export function Hero() {
 
   return (
     <section ref={sectionRef} id="home" className="relative flex min-h-[100svh] flex-col overflow-hidden">
-      {/* Cinematic background — single continuous shot: airliner cruising above a sunlit cloud sea, gliding overhead and away over the islands */}
+      {/* Cinematic background — real window view: wing + engine steady, clouds streaming past forever (crossfade loop, motion never ends) */}
       <motion.div style={{ y: yBg }} className="absolute inset-0">
         {/* Poster stays beneath the video: instant paint + graceful fallback */}
         <Image
-          src="/images/hero-sky-cruise-hd-poster.jpg"
+          src="/images/hero-plane-window-poster.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[62%_50%]"
+          className="hero-poster-drift object-cover object-center"
           aria-hidden="true"
         />
-        {/* src is attached from the in-memory blob once the fetch completes */}
+        {/* src is attached from the in-memory blob once the fetch completes.
+            The footage is a real window view: wing + engine steady, clouds
+            streaming past forever — a crossfade loop, so motion NEVER ends
+            (no plane arriving/exiting = nothing can read as "stopped"). */}
         <video
           ref={videoRef}
-          className={`h-full w-full object-cover object-[62%_50%] transition-opacity duration-[1800ms] ease-out ${
+          className={`h-full w-full object-cover object-center transition-opacity duration-[1800ms] ease-out ${
             videoReady ? "opacity-100" : "opacity-0"
           }`}
-          poster="/images/hero-sky-cruise-hd-poster.jpg"
+          poster="/images/hero-plane-window-poster.jpg"
           muted
           loop
           playsInline

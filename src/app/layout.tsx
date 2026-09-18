@@ -50,13 +50,13 @@ export const metadata: Metadata = {
     siteName: "US Visa Consultant",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/images/hero-sky-cruise-hd-poster.jpg", width: 1280, height: 720, alt: "US Visa Consultant — Airliner cruising above a sunlit cloud sea" }],
+    images: [{ url: "/images/hero-plane-window-poster.jpg", width: 1280, height: 720, alt: "US Visa Consultant — Window view from an airliner: wing and engine above a sea of clouds" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "US Visa Consultant | Worldwide Visa Assistance",
     description: "Expert guidance for every visa journey — visit, study, work or family, across 40+ countries.",
-    images: ["/images/hero-sky-cruise-hd-poster.jpg"],
+    images: ["/images/hero-plane-window-poster.jpg"],
   },
   robots: { index: true, follow: true },
 };
@@ -76,7 +76,7 @@ const localBusinessJsonLd = {
   url: "https://usvisaconsultantpvtltd.com",
   telephone: SITE.phone,
   email: SITE.email,
-  image: "https://usvisaconsultantpvtltd.com/images/hero-sky-cruise-hd-poster.jpg",
+  image: "https://usvisaconsultantpvtltd.com/images/hero-plane-window-poster.jpg",
   logo: "https://usvisaconsultantpvtltd.com/logo.png",
   priceRange: "$",
   address: {
@@ -129,7 +129,7 @@ export default function RootLayout({
         />
         {/* Kick the hero footage download off at HTML-parse time — the
             hero/CTA blob loader then plays from memory (single fetch). */}
-        <link rel="prefetch" href="/videos/hero-sky-cruise-hd.mp4" as="video" />
+        <link rel="prefetch" href="/videos/hero-plane-window-loop.mp4" as="video" />
         {children}
         <Toaster />
       </body>

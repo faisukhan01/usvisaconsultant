@@ -64,7 +64,7 @@ export function canStartSmoothly(
  * entire failure class — once playback starts it runs entirely from memory,
  * the loop seam costs zero network, and hero + CTA share ONE download.
  */
-const HERO_VIDEO_SRC = "/videos/hero-sky-cruise-hd.mp4";
+const HERO_VIDEO_SRC = "/videos/hero-plane-window-loop.mp4";
 
 let blobUrlPromise: Promise<string | null> | null = null;
 
