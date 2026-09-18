@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { NAV_LINKS, SITE } from "@/lib/site-data";
+import { OfficeStatus } from "@/components/site/office-status";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -179,7 +180,9 @@ export function Navbar() {
                   <a href={`tel:${SITE.phone}`} className="mt-1 block font-semibold text-[#1d4fd8]">
                     {SITE.phone}
                   </a>
-                  <p className="mt-2 text-xs">{SITE.hours}</p>
+                  <div className="mt-2 [&>span]:text-[12px]">
+                    <OfficeStatus />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>

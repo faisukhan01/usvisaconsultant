@@ -92,24 +92,32 @@ function GoogleRatingBadge() {
 export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
-  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [hover, setHover] = useState(false);
+  const [hidden, setHidden] = useState(false);
+
+  // Autoplay is a courtesy, never an annoyance: it pauses while the visitor is
+  // reading (hover/focus) and while the tab is hidden. Reduced-motion users
+  // never see it move (enforced below + via motion-reduce CSS on the progress fill).
+  const paused = hover || hidden;
 
   const go = useCallback((dir: number) => {
     setDirection(dir);
     setIndex((i) => (i + dir + TESTIMONIALS.length) % TESTIMONIALS.length);
   }, []);
 
-  const resetTimer = useCallback(() => {
-    if (timer.current) clearInterval(timer.current);
-    timer.current = setInterval(() => go(1), 6000);
-  }, [go]);
-
   useEffect(() => {
-    resetTimer();
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [resetTimer]);
+    const onVis = () => setHidden(document.hidden);
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  // Re-created on every index change → manual navigation always gets a fresh 6s window.
+  useEffect(() => {
+    if (hover || hidden) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const id = setInterval(() => go(1), 6000);
+    return () => clearInterval(id);
+  }, [hover, hidden, index, go]);
 
   const t = TESTIMONIALS[index];
 
@@ -130,7 +138,13 @@ export function Testimonials() {
         <GoogleRatingBadge />
 
         <Reveal delay={0.15}>
-          <div className="relative mt-14">
+          <div
+            className="relative mt-14"
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            onFocus={() => setHover(true)}
+            onBlur={() => setHover(false)}
+          >
             {/* Big quote mark */}
             <Quote className="absolute -top-8 left-1/2 h-16 w-16 -translate-x-1/2 text-[#1d4fd8]/12" />
 
@@ -175,10 +189,7 @@ export function Testimonials() {
             {/* Controls */}
             <div className="mt-8 flex items-center justify-center gap-6">
               <button
-                onClick={() => {
-                  go(-1);
-                  resetTimer();
-                }}
+                onClick={() => go(-1)}
                 aria-label="Previous testimonial"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-sm transition-all hover:border-[#1d4fd8]/40 hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
               >
@@ -191,20 +202,27 @@ export function Testimonials() {
                     onClick={() => {
                       setDirection(i > index ? 1 : -1);
                       setIndex(i);
-                      resetTimer();
                     }}
                     aria-label={`Go to testimonial ${i + 1}`}
-                    className={`h-2 rounded-full transition-all duration-500 ${
+                    aria-current={i === index ? "true" : undefined}
+                    className={`relative h-2 overflow-hidden rounded-full transition-all duration-500 ${
                       i === index ? "w-8 bg-[#1d4fd8]" : "w-2 bg-[#0d1b33]/15 hover:bg-[#0d1b33]/30"
                     }`}
-                  />
+                  >
+                    {i === index && !paused && (
+                      <motion.span
+                        key={index}
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 6, ease: "linear" }}
+                        className="absolute inset-y-0 left-0 rounded-full bg-white/45 motion-reduce:hidden"
+                      />
+                    )}
+                  </button>
                 ))}
               </div>
               <button
-                onClick={() => {
-                  go(1);
-                  resetTimer();
-                }}
+                onClick={() => go(1)}
                 aria-label="Next testimonial"
                 className="flex h-11 w-11 items-center justify-center rounded-full border border-[#0d1b33]/10 bg-white text-[#0d1b33] shadow-sm transition-all hover:border-[#1d4fd8]/40 hover:bg-[#1d4fd8]/8 hover:text-[#1d4fd8]"
               >

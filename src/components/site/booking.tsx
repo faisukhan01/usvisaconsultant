@@ -17,6 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Reveal, SectionHeading } from "@/components/site/reveal";
+import { OfficeStatus } from "@/components/site/office-status";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -300,12 +301,8 @@ export function Booking() {
             </ul>
 
             <Reveal delay={0.35}>
-              <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-[#0d1b33]/8 bg-white p-4 shadow-[0_14px_40px_-28px_rgba(13,27,51,0.4)]">
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                </span>
-                <p className="text-[13px] font-bold text-[#0d1b33]">Mon – Sat · 9 AM – 7 PM PKT</p>
+              <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl border border-[#0d1b33]/8 bg-white p-4 shadow-[0_14px_40px_-28px_rgba(13,27,51,0.4)]">
+                <OfficeStatus />
                 <span className="h-3.5 w-px bg-[#0d1b33]/15" aria-hidden="true" />
                 <a
                   href={`https://wa.me/${WHATSAPP_NUMBER}`}
