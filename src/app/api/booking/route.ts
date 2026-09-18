@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
+import { randomBytes } from "crypto";
 import { db } from "@/lib/db";
 import { isBookableDate, isValidSlot } from "@/lib/booking";
+
+/**
+ * Human-friendly booking reference, e.g. "UVC-7K3M9Q".
+ * Ambiguous glyphs (0/O, 1/I/L) are excluded so it can be read out on a call.
+ */
+const REF_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+function generateBookingReference(): string {
+  const bytes = randomBytes(6);
+  let code = "";
+  for (let i = 0; i < bytes.length; i++) {
+    code += REF_ALPHABET[bytes[i] % REF_ALPHABET.length];
+  }
+  return `UVC-${code}`;
+}
 
 const bookingSchema = z.object({
   name: z.string().trim().min(2, "Please enter your full name").max(80),
@@ -61,14 +77,33 @@ export async function POST(req: NextRequest) {
 
   const { name, email, phone, visaType, date, slot, notes } = parsed.data;
 
+  // The @@unique([date, slot]) constraint is the single source of truth against
+  // double-booking races. A collision on the generated reference (astronomically
+  // rare) simply retries with a fresh code; a collision on date+slot is a 409.
   try {
-    const booking = await db.booking.create({
-      data: { name, email, phone, visaType, date, slot, notes },
-      select: { id: true, date: true, slot: true },
-    });
-    return NextResponse.json({ ok: true, booking }, { status: 201 });
+    for (let attempt = 0; attempt < 4; attempt++) {
+      try {
+        const booking = await db.booking.create({
+          data: { name, email, phone, visaType, date, slot, notes, reference: generateBookingReference() },
+          select: { id: true, reference: true, date: true, slot: true },
+        });
+        return NextResponse.json({ ok: true, booking }, { status: 201 });
+      } catch (err) {
+        if (
+          err instanceof Prisma.PrismaClientKnownRequestError &&
+          err.code === "P2002" &&
+          JSON.stringify(err.meta?.target ?? []).includes("reference")
+        ) {
+          continue; // regenerate the reference and try again
+        }
+        throw err;
+      }
+    }
+    return NextResponse.json(
+      { ok: false, error: "Could not allocate a booking reference — please try again." },
+      { status: 500 }
+    );
   } catch (err) {
-    // The @@unique([date, slot]) constraint is the single source of truth against races.
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
       return NextResponse.json(
         { ok: false, error: "That slot was just booked by someone else — please pick another time." },

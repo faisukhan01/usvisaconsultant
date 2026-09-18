@@ -5,12 +5,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BadgeCheck,
   CalendarCheck2,
+  CalendarPlus,
+  Check,
   CheckCircle2,
   Clock,
+  Copy,
   Loader2,
   MessageCircle,
   Sparkles,
   Video,
+  Zap,
 } from "lucide-react";
 import { Reveal, SectionHeading } from "@/components/site/reveal";
 import { Input } from "@/components/ui/input";
@@ -20,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { SERVICES } from "@/lib/site-data";
 import {
+  BOOKING_SLOTS,
   BOOKING_WINDOW_DAYS,
   prettyDate,
   slotRangeLabel,
@@ -29,6 +34,73 @@ import {
 
 const WHATSAPP_NUMBER = "923124541361";
 const MAX_DATE_CHIPS = 12;
+
+const OFFICE_ADDRESS = "US Visa Consultant, Office #G 29, City Star Shopping Mall, Model Town Link Road, Lahore";
+
+/** RFC 5545 text escaping: backslash first, then semicolons/commas/newlines. */
+function icsEscape(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
+}
+
+/**
+ * Build an RFC 5545 .ics file for the confirmed consultation.
+ * Office slots are PKT (UTC+5) hourly blocks; 09:00–18:00 PKT map to
+ * 04:00–13:00 UTC, so the hour arithmetic never wraps.
+ */
+function buildIcs(opts: { reference: string; date: string; slot: string; visaType: string; name: string }): string {
+  const { reference, date, slot, visaType, name } = opts;
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h] = slot.split(":").map(Number);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const startUTC = `${y}${pad(mo)}${pad(d)}T${pad(h - 5)}0000Z`;
+  const endUTC = `${y}${pad(mo)}${pad(d)}T${pad(h - 4)}0000Z`;
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//US Visa Consultant//Booking//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "BEGIN:VEVENT",
+    `UID:${reference}@usvisaconsultantpvtltd.com`,
+    `DTSTAMP:${stamp}`,
+    `DTSTART:${startUTC}`,
+    `DTEND:${endUTC}`,
+    `SUMMARY:${icsEscape(`Free Visa Consultation — US Visa Consultant (${reference})`)}`,
+    `LOCATION:${icsEscape(OFFICE_ADDRESS)}`,
+    `DESCRIPTION:${icsEscape(
+      `Booking ${reference} · ${visaType} · Free 30-minute one-on-one with a senior visa consultant. ` +
+        `Booked for ${name}. Questions? WhatsApp +92 312 4541361. ` +
+        `Please arrive 10 minutes early and bring any documents related to your case.`
+    )}`,
+    "STATUS:CONFIRMED",
+    "BEGIN:VALARM",
+    "TRIGGER:-PT1H",
+    "ACTION:DISPLAY",
+    "DESCRIPTION:Reminder — your free visa consultation starts in 1 hour.",
+    "END:VALARM",
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ];
+  return lines.join("\r\n");
+}
+
+/** Trigger a browser download of the .ics — pure client-side, no server round-trip. */
+function downloadIcs(opts: { reference: string; date: string; slot: string; visaType: string; name: string }): void {
+  const blob = new Blob([buildIcs(opts)], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `usvc-consultation-${opts.reference}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
 
 type ContactFields = { name: string; phone: string; email: string; visaType: string; notes: string };
 
@@ -69,6 +141,8 @@ export function Booking() {
   const [errors, setErrors] = useState<Partial<Record<keyof ContactFields, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [reference, setReference] = useState("");
+  const [copied, setCopied] = useState(false);
 
   // Dates are timezone-dependent → generate on the client only (no hydration mismatch).
   useEffect(() => {
@@ -97,6 +171,9 @@ export function Booking() {
     if (date) loadSlots(date);
   }, [date, loadSlots]);
 
+  /** Free slots on the selected day — drives the scarcity hint. */
+  const remaining = BOOKING_SLOTS.length - booked.length;
+
   const pick = (key: keyof ContactFields, value: string) => {
     setFields((f) => ({ ...f, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
@@ -113,9 +190,10 @@ export function Booking() {
   };
 
   const waConfirmUrl = useMemo(() => {
-    const text = `Hello US Visa Consultant! I just booked a FREE consultation for ${prettyDate(date)} at ${slotRangeLabel(slot)} (PKT) — ${fields.visaType}. Please confirm. Thank you!`;
+    const refLine = reference ? ` My booking reference is ${reference}.` : "";
+    const text = `Hello US Visa Consultant! I just booked a FREE consultation for ${prettyDate(date)} at ${slotRangeLabel(slot)} (PKT) — ${fields.visaType}.${refLine} Please confirm. Thank you!`;
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  }, [date, slot, fields.visaType]);
+  }, [date, slot, fields.visaType, reference]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,6 +219,7 @@ export function Booking() {
         throw new Error(data.error || "Could not create the booking");
       }
       setConfirmed(true);
+      setReference(typeof data.booking?.reference === "string" ? data.booking.reference : "");
       setBooked((b) => [...b, slot]);
     } catch (err) {
       toast({
@@ -153,8 +232,25 @@ export function Booking() {
     }
   };
 
+  const copyReference = async () => {
+    if (!reference) return;
+    try {
+      await navigator.clipboard.writeText(reference);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({
+        title: "Couldn't copy automatically",
+        description: `Please note it down: ${reference}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const reset = () => {
     setConfirmed(false);
+    setReference("");
+    setCopied(false);
     setFields(INITIAL_FIELDS);
     setSlot("");
     if (date) loadSlots(date);
@@ -258,6 +354,37 @@ export function Booking() {
                         {fields.visaType} · Free consultation · City Star Shopping Mall, Lahore
                       </p>
                     </div>
+                    {reference && (
+                      <div className="mt-3.5 w-full max-w-sm rounded-2xl border-2 border-dashed border-[#1d4fd8]/35 bg-white p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0 text-left">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8291ab]">
+                              Booking reference
+                            </p>
+                            <p className="mt-0.5 font-mono text-lg font-extrabold tracking-[0.2em] text-[#0d1b33]">
+                              {reference}
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={copyReference}
+                            className="h-9 shrink-0 rounded-full border-[#0d1b33]/15 px-4 text-[13px] font-semibold text-[#0d1b33] hover:bg-[#f0f4fd]"
+                          >
+                            {copied ? (
+                              <Check className="mr-1.5 h-3.5 w-3.5 text-emerald-600" />
+                            ) : (
+                              <Copy className="mr-1.5 h-3.5 w-3.5" />
+                            )}
+                            {copied ? "Copied" : "Copy"}
+                          </Button>
+                        </div>
+                        <p className="mt-2 text-left text-[11px] font-medium text-[#8291ab]">
+                          Quote this code on WhatsApp or at the office desk.
+                        </p>
+                      </div>
+                    )}
                     <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#5a6a86]">
                       Save your slot — confirm on WhatsApp and we&apos;ll send a reminder before your
                       visit.
@@ -273,12 +400,28 @@ export function Booking() {
                       </Button>
                       <Button
                         variant="outline"
-                        onClick={reset}
-                        className="h-12 flex-1 rounded-full border-[#0d1b33]/15 text-[15px] font-semibold text-[#0d1b33] hover:bg-[#f0f4fd]"
+                        onClick={() =>
+                          downloadIcs({
+                            reference: reference || "UVC-BOOKING",
+                            date,
+                            slot,
+                            visaType: fields.visaType,
+                            name: fields.name,
+                          })
+                        }
+                        disabled={!reference}
+                        className="h-12 flex-1 rounded-full border-[#1d4fd8]/30 text-[15px] font-semibold text-[#1d4fd8] hover:bg-[#f0f4fd]"
                       >
-                        Book another slot
+                        <CalendarPlus className="mr-2 h-4.5 w-4.5" /> Add to calendar
                       </Button>
                     </div>
+                    <Button
+                      variant="ghost"
+                      onClick={reset}
+                      className="mt-3 h-10 rounded-full px-6 text-[13px] font-semibold text-[#5a6a86] hover:bg-[#f0f4fd] hover:text-[#0d1b33]"
+                    >
+                      Book another slot
+                    </Button>
                   </motion.div>
                 ) : (
                   <motion.form
@@ -317,7 +460,7 @@ export function Booking() {
                                 role="radio"
                                 aria-checked={active}
                                 onClick={() => setDate(d.date)}
-                                className={`flex h-[74px] w-[76px] shrink-0 flex-col items-center justify-center rounded-xl border text-center transition-all duration-300 ${
+                                className={`flex h-[74px] w-[76px] shrink-0 flex-col items-center justify-center rounded-xl border text-center transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4fd8]/50 focus-visible:ring-offset-2 ${
                                   active
                                     ? "border-[#1d4fd8] bg-[#1d4fd8] text-white shadow-[0_12px_28px_-10px_rgba(29,79,216,0.7)]"
                                     : "border-[#0d1b33]/10 bg-white text-[#0d1b33] hover:border-[#1d4fd8]/40 hover:bg-[#f0f4fd]"
@@ -351,8 +494,26 @@ export function Booking() {
                         2
                       </span>
                       Pick a time
-                      <span className="ml-auto text-[10px] font-semibold normal-case tracking-normal text-[#8291ab]">
-                        all times PKT
+                      <span className="ml-auto flex items-center gap-2">
+                        <span className="text-[10px] font-semibold normal-case tracking-normal text-[#8291ab]">
+                          all times PKT
+                        </span>
+                        {date && !slotsLoading && remaining > 0 && remaining <= 3 && (
+                          <span
+                            aria-live="polite"
+                            className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-amber-700"
+                          >
+                            <Zap className="h-3 w-3" /> Only {remaining} left
+                          </span>
+                        )}
+                        {date && !slotsLoading && remaining === 0 && (
+                          <span
+                            aria-live="polite"
+                            className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-red-600"
+                          >
+                            Fully booked
+                          </span>
+                        )}
                       </span>
                     </p>
                     <div
@@ -386,7 +547,7 @@ export function Booking() {
                                 aria-checked={active}
                                 disabled={taken}
                                 onClick={() => setSlot(s)}
-                                className={`h-11 rounded-lg border text-[13px] font-bold transition-all duration-300 ${
+                                className={`h-11 rounded-lg border text-[13px] font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d4fd8]/50 focus-visible:ring-offset-2 ${
                                   taken
                                     ? "cursor-not-allowed border-transparent bg-[#0d1b33]/6 text-[#8291ab] line-through"
                                     : active
@@ -399,6 +560,11 @@ export function Booking() {
                             );
                           })}
                     </div>
+                    {date && !slotsLoading && remaining === 0 && (
+                      <p className="mt-2.5 text-xs font-semibold text-[#8291ab]">
+                        All times for this day are taken — please choose another day.
+                      </p>
+                    )}
 
                     {/* Step 3 — details */}
                     <p className="mt-6 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#5a6a86]">
